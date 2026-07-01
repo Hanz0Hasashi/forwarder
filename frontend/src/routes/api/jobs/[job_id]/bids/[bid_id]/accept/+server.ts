@@ -11,11 +11,15 @@ export async function PATCH({ params }) {
         
     await prisma.bid.update({ where: { id: bid_id }, data: { status: "ACCEPTED" } });
     
+    // Determine the final agreed price (if there was a counter, use that, else use the driver's original bid)
+    const finalPrice = bid.aiCounterAmount !== null ? bid.aiCounterAmount : bid.amount;
+    
     const updatedJob = await prisma.job.update({
       where: { id: job_id }, 
       data: {
         status: "Pending Pickup",
-        forwarderId: bid.forwarderId
+        forwarderId: bid.forwarderId,
+        targetPrice: finalPrice
       }
     });
     
