@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     let job = $state<any>(null);
     let isLoading = $state(true);
@@ -13,7 +13,7 @@
 
         if (jobId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}`);
+                const response = await fetch(`/api/jobs/${jobId}`);
                 if (response.ok) {
                     const result = await response.json();
                     job = result.data;
@@ -36,7 +36,7 @@
         if (!job || !confirm("Are you sure you want to cancel this booking?")) return;
         
         try {
-            const response = await fetch(`${API_BASE_URL}/api/jobs/${job.id}/cancel`, {
+            const response = await fetch(`/api/jobs/${job.id}/cancel`, {
                 method: "PATCH"
             });
             if (response.ok) {

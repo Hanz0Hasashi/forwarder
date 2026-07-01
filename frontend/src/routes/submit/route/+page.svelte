@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     let routeData = $state({
         pickup: "",
@@ -128,7 +128,7 @@
 
             // 3. Send to FastAPI backend
             const response = await fetch(
-                `${API_BASE_URL}/api/submit-job`,
+                `/api/submit-job`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

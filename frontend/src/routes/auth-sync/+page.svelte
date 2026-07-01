@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { API_BASE_URL } from '$lib/api.js';
+    
 
     onMount(() => {
         const checkUser = setInterval(async () => {
@@ -18,7 +18,7 @@
                 const role = user.publicMetadata?.role || user.unsafeMetadata?.role || 'client';
                 
                 try {
-                    await fetch(`${API_BASE_URL}/api/auth-sync`, {
+                    await fetch(`/api/auth-sync`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({

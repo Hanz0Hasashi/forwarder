@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     type DriverRequest = {
         id: string;
@@ -26,7 +26,7 @@
         isLoading = true;
         try {
             const res = await fetch(
-                `${API_BASE_URL}/api/driver-requests`,
+                `/api/driver-requests`,
             );
             if (res.ok) {
                 const json = await res.json();
@@ -66,7 +66,7 @@
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/driver-requests/${id}/approve`,
+                `/api/driver-requests/${id}/approve`,
                 {
                     method: "POST",
                 },
@@ -102,7 +102,7 @@
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/driver-requests/${id}/reject`,
+                `/api/driver-requests/${id}/reject`,
                 {
                     method: "POST",
                 },

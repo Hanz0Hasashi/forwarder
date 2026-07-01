@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     // Existing state
     let availableJobs = $state<any[]>([]);
@@ -16,7 +16,7 @@
     onMount(async () => {
         try {
             const res = await fetch(
-                `${API_BASE_URL}/api/jobs`,
+                `/api/jobs`,
             );
             if (res.ok) {
                 const responseData = await res.json();
@@ -40,7 +40,7 @@
         selectedJob = null;
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/jobs/${jobId}`,
+                `/api/jobs/${jobId}`,
             );
             const result = await response.json();
             if (result.status === "success") {
@@ -65,7 +65,7 @@
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/jobs/${selectedJob.id}/bids`,
+                `/api/jobs/${selectedJob.id}/bids`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -100,7 +100,7 @@
         isAcceptingDeal = true;
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/jobs/${selectedJob.id}/bids/${bidId}/accept`,
+                `/api/jobs/${selectedJob.id}/bids/${bidId}/accept`,
                 {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },

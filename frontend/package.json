@@ -10,7 +10,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"build:vercel": "npx prisma generate --schema=../backend/schema.prisma --generator client_js && npx prisma db push --schema=../backend/schema.prisma && npx prisma db seed && vite build"
+		"build:vercel": "npx prisma generate && npx prisma db push && npx prisma db seed && vite build"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
@@ -38,6 +38,6 @@
 	},
 	"prisma": {
 		"seed": "ts-node prisma/seed.ts",
-		"schema": "../backend/schema.prisma"
+		"schema": "prisma/schema.prisma"
 	}
 }

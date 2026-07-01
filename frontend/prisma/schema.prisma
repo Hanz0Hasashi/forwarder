@@ -1,31 +1,23 @@
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL")
+  url        = env("POSTGRES_PRISMA_URL") // Pooled connection for serverless functions
+  directUrl  = env("POSTGRES_URL_NON_POOLING") // Direct connection for migrations (npx prisma db push)
   extensions = [vector] // Added for pgvector support
 }
 
-generator client {
-  provider             = "prisma-client-py"
-  interface            = "asyncio"
-  recursive_type_depth = 5
-  previewFeatures      = ["postgresqlExtensions"] // Required to enable extensions
-}
-
-// 1. Configured to explicitly output to the SvelteKit node_modules context
 generator client_js {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
-  output          = "../frontend/node_modules/.prisma/client" // FIXED: changed @ to a dot (.)
 }
 
-// 2. Strict Roles for Login Routing
+// Strict Roles for Login Routing
 enum Role {
   CUSTOMER
   FORWARDER
   ADMIN
 }
 
-// 3. The User Table
+// The User Table
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -45,12 +37,11 @@ model User {
 model Job {
   id             String   @id @default(uuid())
   
-  // NEW: Auto-incrementing integer for human-readable IDs (e.g. 1, 2, 3...)
-  // In the UI, we will display this as SF-1, SF-2, etc.
+  // Auto-incrementing integer for human-readable IDs (e.g. 1, 2, 3...)
   jobNumber      Int      @unique @default(autoincrement()) 
   
-  // 4. Foreign Keys: Linking the Job to actual Users
-  customerId     String?  // Made optional temporarily so we don't break your old dummy data
+  // Foreign Keys: Linking the Job to actual Users
+  customerId     String?  
   customer       User?    @relation("CustomerJobs", fields: [customerId], references: [id])
   
   forwarderId    String?  
@@ -74,15 +65,10 @@ model Job {
   aiComplexity   String
 
   // Budget for AI Negotiation
-  targetPrice    Float?   // The budget Intake AI calculates
+  targetPrice    Float?   
 
-  // ==========================================
-  // NEW: NATIVE NEON PGVECTOR
-  // ==========================================
-  // Stores the embedding array directly in Postgres,
-  // replacing the external Upstash reference.
+  // NATIVE NEON PGVECTOR
   embedding      Unsupported("vector(768)")?
-  // ==========================================
 
   // System State
   status         String   @default("Reviewing") 
@@ -90,10 +76,10 @@ model Job {
   updatedAt      DateTime @updatedAt
 
   // Relations
-  bids           Bid[]    // Links the Job to all its negotiations
+  bids           Bid[]    
 }
 
-// 5. The Negotiation Table (Bids)
+// The Negotiation Table (Bids)
 model Bid {
   id              String   @id @default(cuid())
   
@@ -104,11 +90,11 @@ model Bid {
   // Link to the Forwarder (Driver) making the bid
   forwarderId     String?
   forwarder       User?    @relation("ForwarderBids", fields: [forwarderId], references: [id])
-  driverName      String   // Keeping this for fallback/simplicity if auth isn't fully wired yet
+  driverName      String   
   
   // The Money
-  amount          Float    // The driver's initial offer
-  aiCounterAmount Float?   // What the AI counters with (if it haggles)
+  amount          Float    
+  aiCounterAmount Float?   
   
   // The State of the Negotiation
   status          String   @default("PENDING_AI_REVIEW") 
@@ -121,7 +107,7 @@ model DriverRequest {
   lastName        String
   email           String   @unique
   phone           String
-  password        String   // <--- ADD THIS LINE
+  password        String   
   
   // Optional Business Details
   companyName     String?

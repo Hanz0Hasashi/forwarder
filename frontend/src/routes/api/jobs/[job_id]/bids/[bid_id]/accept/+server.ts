@@ -1,0 +1,27 @@
+import { json } from '@sveltejs/kit';
+import { prisma } from '$lib/server/prisma';
+
+export async function PATCH({ params }) {
+  const { job_id, bid_id } = params;
+  try {
+    const bid = await prisma.bid.findUnique({ where: { id: bid_id } });
+    if (!bid) {
+      return json({ detail: "Bid not found" }, { status: 404 });
+    }
+        
+    await prisma.bid.update({ where: { id: bid_id }, data: { status: "ACCEPTED" } });
+    
+    const updatedJob = await prisma.job.update({
+      where: { id: job_id }, 
+      data: {
+        status: "Pending Pickup",
+        forwarderId: bid.forwarderId
+      }
+    });
+    
+    return json({ status: "success", job: updatedJob });
+  } catch (error: any) {
+    console.error("Error in accept_counter_offer:", error);
+    return json({ detail: "Failed to accept offer" }, { status: 500 });
+  }
+}

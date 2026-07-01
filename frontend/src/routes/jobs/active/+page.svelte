@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     // The full lifecycle of a job
     type JobStatus =
@@ -120,7 +120,7 @@
         const damageQuery = aiAssessmentResult === "damage_detected" ? "yes" : "no";
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/jobs/${activeJob.id}/complete?damage=${damageQuery}`,
+                `/api/jobs/${activeJob.id}/complete?damage=${damageQuery}`,
                 {
                     method: "PATCH",
                 },

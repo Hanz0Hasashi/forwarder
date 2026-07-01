@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { API_BASE_URL } from "$lib/api.js";
+    
 
     let trips = $state<any[]>([]);
     let isLoading = $state(true);
@@ -34,7 +34,7 @@
     async function loadTrips() {
         isLoading = true;
         try {
-            let url = `${API_BASE_URL}/api/trips`;
+            let url = `/api/trips`;
             if (currentRole === "admin") {
                 url += `?role=admin`;
             } else if (currentRole === "FORWARDER" || currentRole === "employee") {
@@ -71,7 +71,7 @@
     async function cancelTrip(id: string) {
         if (!confirm("Are you sure you want to cancel this trip?")) return;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/jobs/${id}/cancel`, {
+            const response = await fetch(`/api/jobs/${id}/cancel`, {
                 method: "PATCH",
             });
             if (response.ok) {
@@ -89,7 +89,7 @@
     async function deleteTrip(id: string) {
         if (!confirm("Are you sure you want to delete this trip record permanently? This action cannot be undone.")) return;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/jobs/${id}`, {
+            const response = await fetch(`/api/jobs/${id}`, {
                 method: "DELETE",
             });
             if (response.ok) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { API_BASE_URL } from "$lib/api.js";
+    
     // ── Reactive Language State ──
     let lang = $state<"en" | "de">("en");
 
@@ -175,7 +175,7 @@
         successMessage = "";
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/driver-requests`, {
+            const res = await fetch(`/api/driver-requests`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
