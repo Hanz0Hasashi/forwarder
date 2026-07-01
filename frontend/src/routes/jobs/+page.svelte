@@ -128,6 +128,30 @@
             isAcceptingDeal = false;
         }
     }
+    let isCancelingDeal = $state(false);
+
+    async function cancelBid(bidId: string) {
+        if (!confirm("Are you sure you want to retract this bid?")) return;
+        
+        isCancelingDeal = true;
+        try {
+            const response = await fetch(
+                `/api/jobs/${selectedJob.id}/bids/${bidId}`,
+                { method: "DELETE" }
+            );
+
+            if (response.ok) {
+                selectedJob.bids = selectedJob.bids.filter((b: any) => b.id !== bidId);
+            } else {
+                alert("Failed to cancel bid.");
+            }
+        } catch (error) {
+            console.error("Error canceling bid:", error);
+            alert("Network error.");
+        } finally {
+            isCancelingDeal = false;
+        }
+    }
 </script>
 
 <div class="marketplace-layout">
@@ -281,6 +305,26 @@
                                                     {isAcceptingDeal
                                                         ? "..."
                                                         : "Proceed to Load"}
+                                                </button>
+                                            </div>
+                                        {:else}
+                                            <div class="action-box" style="background: #f1f5f9; border: 1px solid #cbd5e1;">
+                                                <div class="box-text">
+                                                    <span class="box-label text-slate-600">
+                                                        {#if bid.status === "REJECTED"}
+                                                            Offer Rejected
+                                                        {:else}
+                                                            Awaiting Review
+                                                        {/if}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    class="sidebar-btn"
+                                                    style="background: transparent; color: #ef4444; border: 1px solid #ef4444; cursor: pointer;"
+                                                    disabled={isCancelingDeal}
+                                                    onclick={() => cancelBid(bid.id)}
+                                                >
+                                                    {isCancelingDeal ? "..." : "Retract Bid"}
                                                 </button>
                                             </div>
                                         {/if}

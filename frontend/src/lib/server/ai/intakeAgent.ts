@@ -1,12 +1,11 @@
-import { createOpenAI } from '@ai-sdk/openai';
+import { createGroq } from '@ai-sdk/groq';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 
-// Initialize the OpenAI provider pointing to Groq's API
-// This allows us to use Vercel AI SDK with Groq's ultra-fast LLaMA models.
-const groq = createOpenAI({
-  baseURL: 'https://api.groq.com/openai/v1',
+// Initialize the official Groq provider
+// This allows us to use Vercel AI SDK natively with Groq's APIs.
+const groq = createGroq({
   apiKey: env.GROQ_API_KEY,
 });
 
