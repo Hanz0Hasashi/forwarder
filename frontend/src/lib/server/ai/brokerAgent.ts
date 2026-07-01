@@ -29,7 +29,13 @@ Negotiation Rules:
 2. If the bid is up to 20% over budget, make a COUNTER_OFFER. Offer something slightly below their bid, trying to pull them down toward your budget.
 3. If the bid is outrageously high (more than 20% over budget), REJECT it entirely.
 
-You MUST respond ONLY with a valid JSON object matching the requested schema.`;
+You MUST respond ONLY with a valid JSON object matching the requested schema.
+Schema:
+{
+  "decision": "ACCEPTED" | "REJECTED" | "COUNTER_OFFERED",
+  "counter_amount": number | null,
+  "reasoning": "brief internal thought process"
+}`;
 
   try {
     console.log(`🤖 AI Broker waking up to evaluate €${driverAmount} bid against €${budget} budget...`);
@@ -41,9 +47,24 @@ You MUST respond ONLY with a valid JSON object matching the requested schema.`;
       prompt: "Evaluate the bid and return the JSON."
     });
 
-    // Parse the JSON manually since generateObject is deprecated in the latest Vercel AI SDK
-    const object = JSON.parse(text);
-    console.log(`🤖 AI Decision: ${object.decision}`);
+    console.log("=========================================");
+    console.log("🤖 BROKER AI RAW RESPONSE:");
+    console.log(text);
+    console.log("=========================================");
+
+    // Parse the JSON manually, stripping any markdown backticks Groq might have added
+    let jsonString = text.trim();
+    if (jsonString.startsWith('```')) {
+      const match = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (match && match[1]) {
+        jsonString = match[1].trim();
+      }
+    }
+
+    console.log("🧹 CLEANED JSON STRING:", jsonString);
+    const object = JSON.parse(jsonString);
+    console.log("✅ PARSED OBJECT:", object);
+    console.log(`🎯 FINAL AI DECISION: ${object.decision}`);
     return object;
   } catch (error) {
     console.error("⚠️ AI Broker failed to respond:", error);

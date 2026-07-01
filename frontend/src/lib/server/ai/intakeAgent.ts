@@ -36,8 +36,23 @@ Schema:
 }`,
       prompt: `Analyze this job metadata payload: ${JSON.stringify(textLogisticsData)}`
     });
+    console.log("=========================================");
+    console.log("🤖 INTAKE AI RAW RESPONSE:");
+    console.log(text);
+    console.log("=========================================");
 
-    const object = JSON.parse(text);
+    // Parse the JSON manually, stripping any markdown backticks Groq might have added
+    let jsonString = text.trim();
+    if (jsonString.startsWith('```')) {
+      const match = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (match && match[1]) {
+        jsonString = match[1].trim();
+      }
+    }
+    
+    console.log("🧹 CLEANED JSON STRING:", jsonString);
+    const object = JSON.parse(jsonString);
+    console.log("✅ PARSED OBJECT:", object);
     return object;
   } catch (error) {
     console.error("AI Evaluation Error:", error);
