@@ -1,5 +1,5 @@
 import { createGroq } from '@ai-sdk/groq';
-import { generateObject } from 'ai';
+import { generateText } from 'ai';
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 
@@ -34,14 +34,15 @@ You MUST respond ONLY with a valid JSON object matching the requested schema.`;
   try {
     console.log(`🤖 AI Broker waking up to evaluate €${driverAmount} bid against €${budget} budget...`);
 
-    const { object } = await generateObject({
+    const { text } = await generateText({
       model: groq('llama-3.3-70b-versatile'),
-      schema: BrokerDecisionSchema,
-      temperature: 0.2,
+      temperature: 0,
       system: systemPrompt,
       prompt: "Evaluate the bid and return the JSON."
     });
 
+    // Parse the JSON manually since generateObject is deprecated in the latest Vercel AI SDK
+    const object = JSON.parse(text);
     console.log(`🤖 AI Decision: ${object.decision}`);
     return object;
   } catch (error) {

@@ -22,18 +22,22 @@ export async function POST({ request, params }) {
       }
     });
     
+    // AI Broker temporarily disabled by user request. 
+    // All bids will now go directly to the human admin/client for manual review.
+    /*
     const aiResult = await evaluateDriverBid(
       job.make, 
       job.model, 
       job.targetPrice, 
       submission.amount
     );
+    */
     
     const updatedBid = await prisma.bid.update({
       where: { id: newBid.id },
       data: { 
-        status: aiResult.decision, 
-        aiCounterAmount: aiResult.counter_amount 
+        status: "PENDING_HUMAN_REVIEW",
+        aiCounterAmount: null
       }
     });
     

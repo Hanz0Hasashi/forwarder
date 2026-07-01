@@ -1,5 +1,5 @@
 import { createGroq } from '@ai-sdk/groq';
-import { generateObject } from 'ai';
+import { generateText } from 'ai';
 import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 
@@ -21,17 +21,23 @@ export async function evaluateJob(jobData: Record<string, any>) {
   delete textLogisticsData.photos;
 
   try {
-    // B. Call Groq's stable text-only model using Vercel AI SDK's generateObject
-    const { object } = await generateObject({
+    // B. Call Groq's stable text-only model using Vercel AI SDK's generateText
+    const { text } = await generateText({
       model: groq('llama-3.3-70b-versatile'),
-      schema: IntakeEvaluationSchema,
-      temperature: 0.1,
+      temperature: 0,
       system: `You are an expert auto-transport logistics intake manager tracking incoming server payloads.
 Analyze the vehicle logistics specifications and route data provided.
-CRITICAL: You must return ONLY a raw JSON object matching the requested schema exactly.`,
+CRITICAL: You must return ONLY a raw JSON object matching the requested schema exactly.
+Schema:
+{
+  "is_valid": "boolean (True if the job makes logical sense, False if there are major red flags.)",
+  "reasoning": "string (A brief explanation of why the job was processed or flagged.)",
+  "estimated_complexity": "string (Low, Medium, or High based on vehicle information and route details.)"
+}`,
       prompt: `Analyze this job metadata payload: ${JSON.stringify(textLogisticsData)}`
     });
 
+    const object = JSON.parse(text);
     return object;
   } catch (error) {
     console.error("AI Evaluation Error:", error);
