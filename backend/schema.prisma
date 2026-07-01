@@ -1,0 +1,138 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector] // Added for pgvector support
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+  previewFeatures      = ["postgresqlExtensions"] // Required to enable extensions
+}
+
+// 1. Configured to explicitly output to the SvelteKit node_modules context
+generator client_js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  output          = "../frontend/node_modules/.prisma/client" // FIXED: changed @ to a dot (.)
+}
+
+// 2. Strict Roles for Login Routing
+enum Role {
+  CUSTOMER
+  FORWARDER
+  ADMIN
+}
+
+// 3. The User Table
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(CUSTOMER)
+  
+  createdAt DateTime @default(now())
+
+  // Relations: A user can be a customer who creates jobs, or a forwarder who drives them
+  jobsCreated  Job[] @relation("CustomerJobs")
+  jobsAccepted Job[] @relation("ForwarderJobs")
+  
+  // A forwarder can make many bids
+  bids         Bid[] @relation("ForwarderBids")
+}
+
+model Job {
+  id             String   @id @default(uuid())
+  
+  // NEW: Auto-incrementing integer for human-readable IDs (e.g. 1, 2, 3...)
+  // In the UI, we will display this as SF-1, SF-2, etc.
+  jobNumber      Int      @unique @default(autoincrement()) 
+  
+  // 4. Foreign Keys: Linking the Job to actual Users
+  customerId     String?  // Made optional temporarily so we don't break your old dummy data
+  customer       User?    @relation("CustomerJobs", fields: [customerId], references: [id])
+  
+  forwarderId    String?  
+  forwarder      User?    @relation("ForwarderJobs", fields: [forwarderId], references: [id])
+
+  // Vehicle Details
+  make           String
+  model          String
+  year           Int
+  runs           String
+  notes          String?
+
+  // Route Details
+  pickup         String
+  delivery       String
+  distance       String
+
+  // AI Evaluation Results
+  aiIsValid      Boolean
+  aiReasoning    String
+  aiComplexity   String
+
+  // Budget for AI Negotiation
+  targetPrice    Float?   // The budget Intake AI calculates
+
+  // ==========================================
+  // NEW: NATIVE NEON PGVECTOR
+  // ==========================================
+  // Stores the embedding array directly in Postgres,
+  // replacing the external Upstash reference.
+  embedding      Unsupported("vector(768)")?
+  // ==========================================
+
+  // System State
+  status         String   @default("Reviewing") 
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  bids           Bid[]    // Links the Job to all its negotiations
+}
+
+// 5. The Negotiation Table (Bids)
+model Bid {
+  id              String   @id @default(cuid())
+  
+  // Link to the Job
+  jobId           String
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  // Link to the Forwarder (Driver) making the bid
+  forwarderId     String?
+  forwarder       User?    @relation("ForwarderBids", fields: [forwarderId], references: [id])
+  driverName      String   // Keeping this for fallback/simplicity if auth isn't fully wired yet
+  
+  // The Money
+  amount          Float    // The driver's initial offer
+  aiCounterAmount Float?   // What the AI counters with (if it haggles)
+  
+  // The State of the Negotiation
+  status          String   @default("PENDING_AI_REVIEW") 
+  createdAt       DateTime @default(now())
+}
+
+model DriverRequest {
+  id              String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  password        String   // <--- ADD THIS LINE
+  
+  // Optional Business Details
+  companyName     String?
+  vatNumber       String?
+  
+  // Equipment & Compliance
+  licenseClass    String   
+  trailerType     String   
+  hasWinch        Boolean  @default(false) 
+  hasCode95       Boolean  @default(false)
+  
+  status          String   @default("PENDING") 
+  createdAt       DateTime @default(now())
+}

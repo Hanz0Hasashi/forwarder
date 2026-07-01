@@ -1,0 +1,13 @@
+.svelte-kit/
+build/
+node_modules/
+*.js.map
+
+# old flat files superseded by SvelteKit
+index.html
+styles.css
+app.js
+
+.env
+venv/
+.vercel

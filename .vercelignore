@@ -1,0 +1,6 @@
+# Ignore backend env file to prevent duplicate env conflict during Prisma client generation on Vercel
+backend/.env
+
+# Ignore backend virtual environment and python cache
+backend/venv
+backend/__pycache__

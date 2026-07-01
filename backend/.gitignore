@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
+.mypy_cache/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log

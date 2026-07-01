@@ -1,0 +1,23 @@
+# Security
+.env
+.env.*
+*.pem
+
+# Local Testing Scripts (Keep these out of production!)
+test_*.py
+test_vector.py
+
+# Python Virtual Environments
+venv/
+.venv/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Git and OS Clutter
+.git/
+.gitignore
+.DS_Store
