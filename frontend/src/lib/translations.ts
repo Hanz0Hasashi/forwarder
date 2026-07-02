@@ -15,6 +15,12 @@ const en = {
 	nav_drivers: 'For Drivers',
 	nav_signin: 'Sign in',
 	nav_quote: 'Get a quote',
+	nav_trips_board: 'Trips Board',
+	nav_manage_team: 'Manage Team',
+	nav_driver_requests: 'Driver Requests',
+	nav_available_loads: 'Available Loads',
+	nav_my_trips: 'My Trips',
+	nav_book_service: 'Book a Service',
 
 	// HERO
 	hero_badge: '✦ Now with AI negotiation',
@@ -297,6 +303,12 @@ const de: Translations = {
 	nav_drivers: 'Für Fahrer',
 	nav_signin: 'Anmelden',
 	nav_quote: 'Angebot erhalten',
+	nav_trips_board: 'Fahrtenübersicht',
+	nav_manage_team: 'Team verwalten',
+	nav_driver_requests: 'Fahreranfragen',
+	nav_available_loads: 'Verfügbare Ladungen',
+	nav_my_trips: 'Meine Fahrten',
+	nav_book_service: 'Service buchen',
 
 	// HERO
 	hero_badge: '✦ Jetzt mit KI-Verhandlung',

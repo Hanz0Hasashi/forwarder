@@ -3,6 +3,7 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
+    import { translations, type Lang } from "$lib/translations.js";
     import "../app.css";
 
     let { children } = $props();
@@ -10,15 +11,17 @@
     let isChecking = $state(true);
     let currentRole = $state("");
     let mobileMenuOpen = $state(false);
-    let lang = $state("en");
+    let lang = $state<Lang>("en");
+    
+    let t = $derived(translations[lang]);
 
     onMount(() => {
         currentRole = localStorage.getItem("userRole") || "";
-        lang = localStorage.getItem("shutup-lang") || "en";
+        lang = (localStorage.getItem("shutup-lang") as Lang) || "en";
         isChecking = false;
     });
 
-    function setLang(l: string) {
+    function setLang(l: Lang) {
         lang = l;
         localStorage.setItem("shutup-lang", l);
         window.location.reload();
@@ -64,29 +67,29 @@
     let navLinks = $derived(() => {
         if (!currentRole) {
             return [
-                { name: "How It Works", href: "/#how-it-works" },
-                { name: "Step By Step", href: "/#step-by-step" },
-                { name: "Features", href: "/#features" },
-                { name: "FAQ", href: "/#faq" },
-                { name: "For Drivers", href: "/#drivers" },
+                { name: t.nav_how, href: "/#how-it-works" },
+                { name: t.nav_step, href: "/#step-by-step" },
+                { name: t.nav_features, href: "/#features" },
+                { name: t.nav_faq, href: "/#faq" },
+                { name: t.nav_drivers, href: "/#drivers" },
             ];
         }
 
         if (currentRole === "admin" || currentRole === "ADMIN") {
             return [
-                { name: "Trips Board", href: "/trips" },
-                { name: "Manage Team", href: "/admin/users" },
-                { name: "Driver Requests", href: "/admin/drivers" },
+                { name: t.nav_trips_board, href: "/trips" },
+                { name: t.nav_manage_team, href: "/admin/users" },
+                { name: t.nav_driver_requests, href: "/admin/drivers" },
             ];
         } else if (currentRole === "FORWARDER" || currentRole === "employee") {
             return [
-                { name: "Available Loads", href: "/jobs" },
-                { name: "My Trips", href: "/trips" },
+                { name: t.nav_available_loads, href: "/jobs" },
+                { name: t.nav_my_trips, href: "/trips" },
             ];
         } else {
             return [
-                { name: "Book a Service", href: "/submit" },
-                { name: "My Trips", href: "/trips" },
+                { name: t.nav_book_service, href: "/submit" },
+                { name: t.nav_my_trips, href: "/trips" },
             ];
         }
     });

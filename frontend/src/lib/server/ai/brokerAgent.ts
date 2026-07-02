@@ -47,11 +47,6 @@ Schema:
       prompt: "Evaluate the bid and return the JSON."
     });
 
-    console.log("=========================================");
-    console.log("🤖 BROKER AI RAW RESPONSE:");
-    console.log(text);
-    console.log("=========================================");
-
     // Parse the JSON manually, stripping any markdown backticks Groq might have added
     let jsonString = text.trim();
     if (jsonString.startsWith('```')) {
@@ -61,9 +56,7 @@ Schema:
       }
     }
 
-    console.log("🧹 CLEANED JSON STRING:", jsonString);
     const object = JSON.parse(jsonString);
-    console.log("✅ PARSED OBJECT:", object);
     console.log(`🎯 FINAL AI DECISION: ${object.decision}`);
     return object;
   } catch (error) {

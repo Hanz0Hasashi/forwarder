@@ -36,11 +36,6 @@ Schema:
 }`,
       prompt: `Analyze this job metadata payload: ${JSON.stringify(textLogisticsData)}`
     });
-    console.log("=========================================");
-    console.log("🤖 INTAKE AI RAW RESPONSE:");
-    console.log(text);
-    console.log("=========================================");
-
     // Parse the JSON manually, stripping any markdown backticks Groq might have added
     let jsonString = text.trim();
     if (jsonString.startsWith('```')) {
@@ -50,9 +45,7 @@ Schema:
       }
     }
     
-    console.log("🧹 CLEANED JSON STRING:", jsonString);
     const object = JSON.parse(jsonString);
-    console.log("✅ PARSED OBJECT:", object);
     return object;
   } catch (error) {
     console.error("AI Evaluation Error:", error);
