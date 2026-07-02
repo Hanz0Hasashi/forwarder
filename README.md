@@ -31,8 +31,11 @@ Instead of relying on human brokers, the platform uses AI agents to automate dis
 ### Driver Marketplace & Bidding
 ![Driver Marketplace Placeholder](./screenshots/driver-marketplace.png)
 
-### Active Load Tracker
-![Active Load Tracker Placeholder](./screenshots/active-tracker.png)
+### Admin-Pages (Trips-Board, Manage-Team)
+![Admin-Pages Placeholder](./screenshots/admin-page-1.png)
+
+![Admin-Pages Placeholder](./screenshots/admin-page-2.png)
+
 
 
 ## Tech Stack
