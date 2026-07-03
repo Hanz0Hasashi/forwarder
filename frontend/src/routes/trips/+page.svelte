@@ -276,7 +276,7 @@
                         </div>
 
                         <!-- Client Review UI for Pending Bids -->
-                        {#if trip.status === 'Pending Client Approval' && (currentRole !== 'FORWARDER' && currentRole !== 'employee')}
+                        {#if trip.status === 'Pending Client Approval' && (currentRole === 'CUSTOMER' || currentRole === 'client')}
                             {#if trip.bids && trip.bids.some((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
                                 {@const pendingBid = trip.bids.find((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
                                 <div class="col-span-full mt-4 p-4 rounded-xl border border-yellow-300 bg-yellow-50 flex flex-col md:flex-row justify-between items-center gap-4">
