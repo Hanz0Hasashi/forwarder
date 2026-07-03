@@ -56,10 +56,15 @@
     }
 
     let filteredTrips = $derived(() => {
-        return trips.filter((t) => {
+        return trips.filter((t: any) => {
+            const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? t.bids?.find((b: any) => b.forwarderId === currentUserId) : null;
+            const isLost = driverBid && ((t.forwarderId && t.forwarderId !== currentUserId) || (driverBid.status === 'REJECTED_BY_CLIENT'));
+            
             if (activeTab === "ongoing") {
+                if (isLost) return false;
                 return ["Reviewing", "Pending Client Approval", "Pending Pickup", "In Transit", "Delivery Protocol"].includes(t.status);
             } else if (activeTab === "completed") {
+                if (isLost) return true;
                 return t.status === "Completed";
             } else if (activeTab === "canceled") {
                 return t.status === "Canceled";
@@ -231,8 +236,8 @@
             </div>
             <div class="trips-list-rows">
                 {#each filteredTrips() as trip (trip.id)}
-                    {@const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? trip.bids?.find((b: any) => b.forwarderId === currentUser?.id) : null}
-                    {@const isLost = driverBid && trip.forwarderId && trip.forwarderId !== currentUser?.id}
+                    {@const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? trip.bids?.find((b: any) => b.forwarderId === currentUserId) : null}
+                    {@const isLost = driverBid && trip.forwarderId && trip.forwarderId !== currentUserId}
                     {@const isRejected = driverBid && driverBid.status === 'REJECTED_BY_CLIENT'}
                     <div class="trip-list-row">
                         <div class="cell-trip-id">
