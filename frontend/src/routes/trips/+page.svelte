@@ -231,6 +231,9 @@
             </div>
             <div class="trips-list-rows">
                 {#each filteredTrips() as trip (trip.id)}
+                    {@const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? trip.bids?.find((b: any) => b.forwarderId === currentUser?.id) : null}
+                    {@const isLost = driverBid && trip.forwarderId && trip.forwarderId !== currentUser?.id}
+                    {@const isRejected = driverBid && driverBid.status === 'REJECTED_BY_CLIENT'}
                     <div class="trip-list-row">
                         <div class="cell-trip-id">
                             <span class="trip-id-tag">SF-{trip.jobNumber}</span>
@@ -246,9 +249,6 @@
                             <span class="budget-amount">€{trip.targetPrice || 500}</span>
                         </div>
                         <div class="cell-status">
-                            {@const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? trip.bids?.find((b: any) => b.forwarderId === currentUser?.id) : null}
-                            {@const isLost = driverBid && trip.forwarderId && trip.forwarderId !== currentUser?.id}
-                            {@const isRejected = driverBid && driverBid.status === 'REJECTED_BY_CLIENT'}
                             
                             {#if isLost || isRejected}
                                 <span class="status-badge status-canceled" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;">
