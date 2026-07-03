@@ -16,6 +16,15 @@ export async function PATCH({ params }) {
         
     await prisma.bid.update({ where: { id: bid_id }, data: { status: "ACCEPTED" } });
     
+    // Reject all other pending bids on this job
+    await prisma.bid.updateMany({
+      where: {
+        jobId: job_id,
+        id: { not: bid_id }
+      },
+      data: { status: "REJECTED_BY_CLIENT" }
+    });
+    
     // The final price is whatever was locked into aiCounterAmount
     const finalPrice = bid.aiCounterAmount !== null ? bid.aiCounterAmount : bid.amount;
     

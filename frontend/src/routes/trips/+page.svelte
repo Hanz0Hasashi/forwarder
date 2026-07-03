@@ -246,9 +246,23 @@
                             <span class="budget-amount">€{trip.targetPrice || 500}</span>
                         </div>
                         <div class="cell-status">
-                            <span class="status-badge {getStatusClass(trip.status)}">
-                                {getDisplayStatus(trip.status)}
-                            </span>
+                            {@const driverBid = (currentRole === 'FORWARDER' || currentRole === 'employee') ? trip.bids?.find((b: any) => b.forwarderId === currentUser?.id) : null}
+                            {@const isLost = driverBid && trip.forwarderId && trip.forwarderId !== currentUser?.id}
+                            {@const isRejected = driverBid && driverBid.status === 'REJECTED_BY_CLIENT'}
+                            
+                            {#if isLost || isRejected}
+                                <span class="status-badge status-canceled" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;">
+                                    Not Selected
+                                </span>
+                            {:else if driverBid && driverBid.status === 'AWAITING_CLIENT_APPROVAL'}
+                                <span class="status-badge status-warning">
+                                    Awaiting Client Final Approval
+                                </span>
+                            {:else}
+                                <span class="status-badge {getStatusClass(trip.status)}">
+                                    {getDisplayStatus(trip.status)}
+                                </span>
+                            {/if}
                         </div>
                         <div class="cell-actions text-right">
                             <div class="flex-actions justify-end">
@@ -278,17 +292,18 @@
                         <!-- Client Review UI for Pending Bids -->
                         {#if trip.status === 'Pending Client Approval' && (currentRole === 'CUSTOMER' || currentRole === 'client')}
                             {#if trip.bids && trip.bids.some((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
-                                {@const pendingBid = trip.bids.find((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
-                                <div class="col-span-full mt-4 p-4 rounded-xl border border-yellow-300 bg-yellow-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                                    <div>
-                                        <h4 class="text-yellow-800 font-bold m-0 text-lg">Action Required: Finalize Rate</h4>
-                                        <p class="text-yellow-700 text-sm m-0 mt-1">Driver <strong>{pendingBid.driverName}</strong> agreed to <strong>€{pendingBid.aiCounterAmount}</strong>. Please confirm to dispatch this driver.</p>
+                                {#each trip.bids.filter((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL') as pendingBid}
+                                    <div class="col-span-full mt-4 p-4 rounded-xl border border-yellow-300 bg-yellow-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                                        <div>
+                                            <h4 class="text-yellow-800 font-bold m-0 text-lg">Action Required: Finalize Rate</h4>
+                                            <p class="text-yellow-700 text-sm m-0 mt-1">Driver <strong>{pendingBid.driverName}</strong> agreed to <strong>€{pendingBid.aiCounterAmount}</strong>. Please confirm to dispatch this driver.</p>
+                                        </div>
+                                        <div class="flex gap-2 w-full md:w-auto">
+                                            <button onclick={() => clientRejectBid(trip.id, pendingBid.id)} class="btn-action btn-outline flex-1 md:flex-none" style="background: white;">Decline</button>
+                                            <button onclick={() => clientAcceptBid(trip.id, pendingBid.id)} class="btn-action btn-primary flex-1 md:flex-none" style="background: #ca8a04; color: white;">Accept €{pendingBid.aiCounterAmount}</button>
+                                        </div>
                                     </div>
-                                    <div class="flex gap-2 w-full md:w-auto">
-                                        <button onclick={() => clientRejectBid(trip.id, pendingBid.id)} class="btn-action btn-outline flex-1 md:flex-none" style="background: white;">Decline</button>
-                                        <button onclick={() => clientAcceptBid(trip.id, pendingBid.id)} class="btn-action btn-primary flex-1 md:flex-none" style="background: #ca8a04; color: white;">Accept €{pendingBid.aiCounterAmount}</button>
-                                    </div>
-                                </div>
+                                {/each}
                             {/if}
                         {/if}
 

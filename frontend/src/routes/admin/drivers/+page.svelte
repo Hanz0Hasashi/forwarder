@@ -74,6 +74,7 @@
             const json = await response.json();
 
             if (!response.ok) {
+                alert(json.detail || "Unable to approve the driver request.");
                 showStatus(
                     json.detail || "Unable to approve the driver request.",
                     "error",
@@ -88,6 +89,7 @@
             );
         } catch (error) {
             console.error(error);
+            alert("Unable to approve the driver request. Please try again.");
             showStatus(
                 "Unable to approve the driver request. Please try again.",
                 "error",
@@ -145,7 +147,7 @@
         <div class="flex items-center gap-3">
             <button
                 type="button"
-                on:click={fetchRequests}
+                onclick={fetchRequests}
                 disabled={isLoading}
                 class="flex items-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm px-4 py-2.5 rounded-lg font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-50"
             >
@@ -242,7 +244,7 @@
                             >
                                 <button
                                     type="button"
-                                    on:click={() => approveDriver(req.id)}
+                                    onclick={() => approveDriver(req.id)}
                                     class="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-150 ease-in-out hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
                                     disabled={processingIds.includes(req.id)}
                                 >
@@ -250,7 +252,7 @@
                                 </button>
                                 <button
                                     type="button"
-                                    on:click={() => rejectDriver(req.id)}
+                                    onclick={() => rejectDriver(req.id)}
                                     class="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition duration-150 ease-in-out hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-red-100 disabled:text-red-200"
                                     disabled={processingIds.includes(req.id)}
                                 >

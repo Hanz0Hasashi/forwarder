@@ -46,7 +46,7 @@ async function main() {
   const makes = ['Toyota', 'Ford', 'Honda', 'Chevrolet', 'BMW', 'Audi', 'Mercedes', 'Nissan', 'Hyundai', 'Kia'];
   const models = ['Camry', 'Mustang', 'Civic', 'Silverado', 'X5', 'A4', 'C-Class', 'Altima', 'Elantra', 'Sorento'];
   const locations = ['Los Angeles, CA', 'San Francisco, CA', 'Austin, TX', 'Dallas, TX', 'New York, NY', 'Miami, FL', 'Chicago, IL', 'Seattle, WA', 'Denver, CO', 'Phoenix, AZ'];
-  const statuses = ['Reviewing', 'Awaited', 'Completed', 'Rejected', 'In Transit'];
+  const statuses = ['Reviewing', 'Pending Client Approval', 'Pending Pickup', 'In Transit', 'Completed', 'Canceled'];
   
   const newJobs = [];
 
@@ -80,6 +80,7 @@ async function main() {
         aiComplexity: runs === 'Yes' ? 'LOW' : 'MEDIUM',
         targetPrice,
         status,
+        forwarderId: ['Pending Pickup', 'In Transit', 'Completed'].includes(status) ? forwarder.id : null,
       }
     });
     
@@ -87,13 +88,19 @@ async function main() {
 
     // Add bids for some jobs (70% chance)
     if (Math.random() > 0.3) {
+      let bidStatus = 'PENDING_AI_REVIEW';
+      if (['Pending Pickup', 'In Transit', 'Completed'].includes(status)) bidStatus = 'ACCEPTED';
+      if (status === 'Pending Client Approval') bidStatus = 'AWAITING_CLIENT_APPROVAL';
+      if (status === 'Canceled') bidStatus = 'REJECTED_BY_CLIENT';
+
       await prisma.bid.create({
         data: {
           jobId: job.id,
           forwarderId: forwarder.id,
           driverName: forwarder.name || 'Bob Transporter',
           amount: targetPrice + (Math.random() > 0.5 ? 50 : -50),
-          status: status === 'Completed' || status === 'In Transit' ? 'ACCEPTED' : (status === 'Rejected' ? 'REJECTED' : 'PENDING_AI_REVIEW')
+          aiCounterAmount: bidStatus === 'AWAITING_CLIENT_APPROVAL' || bidStatus === 'ACCEPTED' ? targetPrice : null,
+          status: bidStatus
         }
       });
     }

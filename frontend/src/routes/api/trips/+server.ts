@@ -13,7 +13,10 @@ export async function GET({ url }) {
   } else if (customerId) {
     whereClause.customerId = customerId;
   } else if (forwarderId) {
-    whereClause.forwarderId = forwarderId;
+    whereClause.OR = [
+      { forwarderId: forwarderId },
+      { bids: { some: { forwarderId: forwarderId } } }
+    ];
   }
       
   try {

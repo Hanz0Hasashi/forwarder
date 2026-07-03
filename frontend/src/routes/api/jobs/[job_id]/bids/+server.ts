@@ -11,6 +11,10 @@ export async function POST({ request, params }) {
     if (!job) {
       return json({ detail: "Job not found" }, { status: 404 });
     }
+    
+    if (job.status !== "Reviewing") {
+      return json({ detail: "This job is no longer accepting bids." }, { status: 403 });
+    }
 
     const newBid = await prisma.bid.create({
       data: {
