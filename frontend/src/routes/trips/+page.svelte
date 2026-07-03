@@ -58,7 +58,7 @@
     let filteredTrips = $derived(() => {
         return trips.filter((t) => {
             if (activeTab === "ongoing") {
-                return ["Reviewing", "Pending Pickup", "In Transit", "Delivery Protocol"].includes(t.status);
+                return ["Reviewing", "Pending Client Approval", "Pending Pickup", "In Transit", "Delivery Protocol"].includes(t.status);
             } else if (activeTab === "completed") {
                 return t.status === "Completed";
             } else if (activeTab === "canceled") {
@@ -109,9 +109,40 @@
         goto("/jobs/active");
     }
 
+    async function clientAcceptBid(tripId: string, bidId: string) {
+        if (!confirm("Are you sure you want to lock in this driver and rate?")) return;
+        try {
+            const response = await fetch(`/api/jobs/${tripId}/bids/${bidId}/client-accept`, { method: "PATCH" });
+            if (response.ok) {
+                alert("Driver confirmed! The job is now active.");
+                loadTrips();
+            } else {
+                alert("Failed to confirm driver.");
+            }
+        } catch (e) {
+            alert("Network error");
+        }
+    }
+
+    async function clientRejectBid(tripId: string, bidId: string) {
+        if (!confirm("Are you sure you want to decline this rate and wait for other drivers?")) return;
+        try {
+            const response = await fetch(`/api/jobs/${tripId}/bids/${bidId}/client-reject`, { method: "PATCH" });
+            if (response.ok) {
+                alert("Rate declined. Waiting for new bids.");
+                loadTrips();
+            } else {
+                alert("Failed to decline rate.");
+            }
+        } catch (e) {
+            alert("Network error");
+        }
+    }
+
     function getDisplayStatus(status: string): string {
         switch (status) {
             case "Reviewing": return "Awaiting Bids";
+            case "Pending Client Approval": return "Awaiting Final Approval";
             case "Pending Pickup": return "Driver Assigned";
             case "In Transit": return "In Transit";
             case "Delivery Protocol": return "Verification";
@@ -128,6 +159,8 @@
             case "In Transit":
             case "Delivery Protocol":
                 return "status-transit";
+            case "Pending Client Approval":
+                return "status-warning";
             default: return "status-pending";
         }
     }
@@ -241,6 +274,23 @@
                                 {/if}
                             </div>
                         </div>
+
+                        <!-- Client Review UI for Pending Bids -->
+                        {#if trip.status === 'Pending Client Approval' && (currentRole !== 'FORWARDER' && currentRole !== 'employee')}
+                            {#if trip.bids && trip.bids.some((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
+                                {@const pendingBid = trip.bids.find((b: any) => b.status === 'AWAITING_CLIENT_APPROVAL')}
+                                <div class="col-span-full mt-4 p-4 rounded-xl border border-yellow-300 bg-yellow-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                                    <div>
+                                        <h4 class="text-yellow-800 font-bold m-0 text-lg">Action Required: Finalize Rate</h4>
+                                        <p class="text-yellow-700 text-sm m-0 mt-1">Driver <strong>{pendingBid.driverName}</strong> agreed to <strong>€{pendingBid.aiCounterAmount}</strong>. Please confirm to dispatch this driver.</p>
+                                    </div>
+                                    <div class="flex gap-2 w-full md:w-auto">
+                                        <button onclick={() => clientRejectBid(trip.id, pendingBid.id)} class="btn-action btn-outline flex-1 md:flex-none" style="background: white;">Decline</button>
+                                        <button onclick={() => clientAcceptBid(trip.id, pendingBid.id)} class="btn-action btn-primary flex-1 md:flex-none" style="background: #ca8a04; color: white;">Accept €{pendingBid.aiCounterAmount}</button>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/if}
 
                         <!-- Real-time damage logs display if Completed -->
                         {#if trip.status === 'Completed'}
@@ -499,6 +549,11 @@
     .status-pending {
         background: #fffbeb;
         color: #d97706;
+    }
+    .status-warning {
+        background: #fef08a;
+        color: #854d0e;
+        border: 1px solid #ca8a04;
     }
     .status-transit {
         background: #eff6ff;

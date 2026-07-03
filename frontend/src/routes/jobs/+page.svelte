@@ -110,14 +110,12 @@
             const result = await response.json();
 
             if (result.status === "success") {
-                // 1. Save the job to memory so the active dashboard knows what to load
-                localStorage.setItem(
-                    "activeTransitJob",
-                    JSON.stringify(selectedJob),
-                );
-
-                // 2. Teleport the driver to their active jobs dashboard!
-                goto("/jobs/active");
+                // Update the local bid status to reflect the new state
+                const bid = selectedJob.bids.find((b: any) => b.id === bidId);
+                if (bid) {
+                    bid.status = "AWAITING_CLIENT_APPROVAL";
+                }
+                alert("Offer accepted! Waiting for final client approval.");
             } else {
                 alert("Failed to accept the deal.");
             }
@@ -283,6 +281,13 @@
                                                         : "Accept"}
                                                 </button>
                                             </div>
+                                        {:else if bid.status === "AWAITING_CLIENT_APPROVAL"}
+                                            <div class="action-box" style="background: #fffbeb; border: 1px solid #fde68a;">
+                                                <div class="box-text">
+                                                    <span class="box-label" style="color: #d97706;">Awaiting Client Approval</span>
+                                                    <span class="box-subtext" style="color: #92400e;">The client is reviewing your final rate.</span>
+                                                </div>
+                                            </div>
                                         {:else if bid.status === "ACCEPTED"}
                                             <div class="action-box success-box">
                                                 <div class="box-text">
@@ -296,15 +301,12 @@
                                                 </div>
                                                 <button
                                                     class="btn-success sidebar-btn"
-                                                    disabled={isAcceptingDeal}
-                                                    onclick={() =>
-                                                        acceptCounterOffer(
-                                                            bid.id,
-                                                        )}
+                                                    onclick={() => {
+                                                        localStorage.setItem("activeTransitJob", JSON.stringify(selectedJob));
+                                                        goto("/jobs/active");
+                                                    }}
                                                 >
-                                                    {isAcceptingDeal
-                                                        ? "..."
-                                                        : "Proceed to Load"}
+                                                    Proceed to Load
                                                 </button>
                                             </div>
                                         {:else}
