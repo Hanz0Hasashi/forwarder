@@ -257,7 +257,7 @@
                                         Track
                                     </a>
                                 {/if}
-                                {#if ['Reviewing', 'Pending Pickup'].includes(trip.status)}
+                                {#if currentRole !== 'admin' && ['Reviewing', 'Pending Client Approval', 'Pending Pickup'].includes(trip.status)}
                                     <button onclick={() => cancelTrip(trip.id)} class="btn-action btn-danger btn-sm">
                                         Cancel
                                     </button>
