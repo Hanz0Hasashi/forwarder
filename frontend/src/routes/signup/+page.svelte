@@ -1,5 +1,8 @@
 <script lang="ts">
     import { SignUp } from 'svelte-clerk';
+    import { env } from '$env/dynamic/public';
+
+    const clerkPublishableKey = env.PUBLIC_CLERK_PUBLISHABLE_KEY;
 </script>
 
 <svelte:head>
@@ -27,7 +30,13 @@
         <!-- Clerk Component Box -->
         <div class="w-full shadow-2xl rounded-2xl overflow-hidden border border-slate-100 bg-white flex justify-center p-2">
             <!-- We point signInUrl back to your custom login page -->
-            <SignUp signInUrl="/login" fallbackRedirectUrl="/dashboard" />
+            {#if clerkPublishableKey}
+                <SignUp signInUrl="/login" fallbackRedirectUrl="/dashboard" />
+            {:else}
+                <div class="w-full bg-amber-100 text-amber-900 border border-amber-300 rounded-xl p-4 text-sm text-center">
+                    Clerk is not configured. Set <strong>PUBLIC_CLERK_PUBLISHABLE_KEY</strong> and restart the dev server.
+                </div>
+            {/if}
         </div>
     </div>
 </section>

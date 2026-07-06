@@ -243,8 +243,8 @@
 
                 <hr class="divider" />
 
-                <div class="form-group">
-                    <label>Does the car drive on its own?</label>
+                <fieldset class="form-group">
+                    <legend>Does the car drive on its own?</legend>
                     <div class="radio-group">
                         <label class="radio-label">
                             <input
@@ -265,12 +265,12 @@
                             No, it doesn't start/drive
                         </label>
                     </div>
-                </div>
+                </fieldset>
 
                 <hr class="divider" />
 
-                <div class="form-group">
-                    <label>Any extras attached or inside the car?</label>
+                <fieldset class="form-group">
+                    <legend>Any extras attached or inside the car?</legend>
                     <div class="checkbox-group">
                         <label class="checkbox-label">
                             <input
@@ -297,7 +297,7 @@
                             Extra set of wheels
                         </label>
                     </div>
-                </div>
+                </fieldset>
 
                 <button
                     type="submit"
@@ -419,6 +419,19 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        border: 0;
+        margin: 0;
+        padding: 0;
+        min-inline-size: 0;
+    }
+
+    legend {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        padding: 0;
     }
 
     label {

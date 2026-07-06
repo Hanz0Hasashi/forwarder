@@ -18,8 +18,8 @@
     };
 
     let requests = $state<DriverRequest[]>([]);
-    let statusMessage = "";
-    let statusType: "success" | "error" | "" = "";
+    let statusMessage = $state("");
+    let statusType = $state<"success" | "error" | "">("");
     let isLoading = $state(false);
 
     async function fetchRequests() {
@@ -44,7 +44,7 @@
 
     onMount(fetchRequests);
 
-    let processingIds: string[] = [];
+    let processingIds = $state<string[]>([]);
 
     function showStatus(message: string, type: "success" | "error") {
         statusMessage = message;

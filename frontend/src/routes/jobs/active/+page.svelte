@@ -133,7 +133,8 @@
                 goto("/jobs");
             } else {
                 const errorData = await response.json();
-                alert("Failed to complete job: " + errorData.detail);
+                const message = errorData.detail || errorData.error || "Unknown error";
+                alert("Failed to complete job: " + message);
             }
         } catch (error) {
             console.error("Error completing job:", error);

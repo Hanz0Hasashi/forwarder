@@ -1,9 +1,14 @@
 import { json } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 
-export async function PATCH({ params }) {
+export async function PATCH({ params, locals }) {
   const { job_id, bid_id } = params;
   try {
+    const { userId, role } = locals.auth;
+    if (!userId || !role) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const bid = await prisma.bid.findUnique({ 
       where: { id: bid_id },
       include: { job: true } 
@@ -11,6 +16,10 @@ export async function PATCH({ params }) {
     
     if (!bid) {
       return json({ detail: "Bid not found" }, { status: 404 });
+    }
+
+    if (role !== 'ADMIN' && bid.forwarderId !== userId) {
+      return json({ error: 'Forbidden' }, { status: 403 });
     }
     
     if (bid.job.status !== "Reviewing" && bid.job.status !== "Pending Client Approval") {
@@ -20,20 +29,21 @@ export async function PATCH({ params }) {
     // Determine the final agreed price (if there was a counter, use that, else use the driver's original bid)
     const finalPrice = bid.aiCounterAmount !== null ? bid.aiCounterAmount : bid.amount;
 
-    await prisma.bid.update({ 
-      where: { id: bid_id }, 
-      data: { 
-        status: "AWAITING_CLIENT_APPROVAL",
-        aiCounterAmount: finalPrice // Lock in the final negotiated price
-      } 
-    });
-    
-    const updatedJob = await prisma.job.update({
-      where: { id: job_id }, 
-      data: {
-        status: "Pending Client Approval"
-      }
-    });
+    const [, updatedJob] = await prisma.$transaction([
+      prisma.bid.update({
+        where: { id: bid_id },
+        data: {
+          status: "AWAITING_CLIENT_APPROVAL",
+          aiCounterAmount: finalPrice // Lock in the final negotiated price
+        }
+      }),
+      prisma.job.update({
+        where: { id: job_id },
+        data: {
+          status: "Pending Client Approval"
+        }
+      })
+    ]);
     
     return json({ status: "success", job: updatedJob });
   } catch (error: any) {

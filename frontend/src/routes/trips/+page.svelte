@@ -588,12 +588,6 @@
         color: #ef4444;
     }
 
-    .vehicle-details h3 {
-        margin: 0 0 4px 0;
-        font-size: 1.25rem;
-        font-weight: 850;
-        color: #0f172a;
-    }
     .meta {
         font-size: 0.85rem;
         color: #64748b;
@@ -631,19 +625,6 @@
     .delivery-dot {
         background: #10b981;
     }
-    .route-point .label {
-        display: block;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: #64748b;
-        letter-spacing: 0.5px;
-    }
-    .route-point .city {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
 
     /* Price / Date info */
     .price-info {
@@ -654,14 +635,6 @@
         padding: 12px;
         border-radius: 12px;
         border: 1px solid #cbd5e1;
-    }
-    .price-info .label {
-        display: block;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: #64748b;
-        margin-bottom: 2px;
     }
     .price-value {
         font-size: 1.15rem;

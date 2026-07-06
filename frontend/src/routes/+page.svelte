@@ -549,7 +549,7 @@
 <footer class="footer">
     <div class="container footer-inner">
         <div class="footer-brand">
-            <a href="#" class="nav__logo">
+            <a href="/" class="nav__logo">
                 <span class="logo-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
                         <path d="M10 17h4V5H2v12h3"></path>
@@ -563,9 +563,9 @@
             </a>
             <p>{t.footer_tagline}</p>
             <div class="footer-social">
-                <a href="#" aria-label="LinkedIn">in</a>
-                <a href="#" aria-label="Instagram">ig</a>
-                <a href="#" aria-label="Facebook">fb</a>
+                <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a>
+                <a href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">ig</a>
+                <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">fb</a>
             </div>
         </div>
         <div class="footer-links">
@@ -579,25 +579,25 @@
             </div>
             <div class="footer-col">
                 <h5>{t.footer_routes}</h5>
-                <a href="#">{t.footer_nl}</a>
-                <a href="#">{t.footer_de}</a>
-                <a href="#">{t.footer_be}</a>
-                <a href="#">{t.footer_fr}</a>
-                <a href="#">{t.footer_eu}</a>
+                <a href="/submit?region=nl">{t.footer_nl}</a>
+                <a href="/submit?region=de">{t.footer_de}</a>
+                <a href="/submit?region=be">{t.footer_be}</a>
+                <a href="/submit?region=fr">{t.footer_fr}</a>
+                <a href="/submit?region=eu">{t.footer_eu}</a>
             </div>
             <div class="footer-col">
                 <h5>{t.footer_company}</h5>
-                <a href="#">{t.footer_about}</a>
-                <a href="#">{t.footer_blog}</a>
-                <a href="#">{t.footer_careers}</a>
-                <a href="#">{t.footer_contact}</a>
+                <a href="/#how-it-works">{t.footer_about}</a>
+                <a href="/#testimonials">{t.footer_blog}</a>
+                <a href="/driver-apply">{t.footer_careers}</a>
+                <a href="/#faq">{t.footer_contact}</a>
             </div>
             <div class="footer-col">
                 <h5>{t.footer_legal}</h5>
-                <a href="#">{t.footer_tos}</a>
-                <a href="#">{t.footer_privacy}</a>
-                <a href="#">{t.footer_cookies}</a>
-                <a href="#">{t.footer_cmr}</a>
+                <a href="/#faq">{t.footer_tos}</a>
+                <a href="/#faq">{t.footer_privacy}</a>
+                <a href="/#faq">{t.footer_cookies}</a>
+                <a href="/#protection">{t.footer_cmr}</a>
             </div>
         </div>
     </div>

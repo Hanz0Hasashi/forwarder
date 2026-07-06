@@ -56,16 +56,17 @@ Schema:
       }
     }
 
-    const object = JSON.parse(jsonString);
-    console.log(`🎯 FINAL AI DECISION: ${object.decision}`);
-    return object;
+    const parsed = JSON.parse(jsonString);
+    const result = BrokerDecisionSchema.parse(parsed);
+    console.log(`🎯 FINAL AI DECISION: ${result.decision}`);
+    return result;
   } catch (error) {
     console.error("⚠️ AI Broker failed to respond:", error);
     // Safe fallback if the AI crashes
     return {
-      decision: "PENDING_HUMAN_REVIEW",
+      decision: "REJECTED",
       counter_amount: null,
       reasoning: "AI failure"
-    };
+    } as const;
   }
 }

@@ -45,8 +45,8 @@ Schema:
       }
     }
     
-    const object = JSON.parse(jsonString);
-    return object;
+    const parsed = JSON.parse(jsonString);
+    return IntakeEvaluationSchema.parse(parsed);
   } catch (error) {
     console.error("AI Evaluation Error:", error);
     // Secure fallback in case of API interruptions so the app doesn't crash
@@ -54,6 +54,6 @@ Schema:
       is_valid: true,
       reasoning: "Logistics data processed successfully (Fallback validation mode active).",
       estimated_complexity: "Medium"
-    };
+    } as const;
   }
 }

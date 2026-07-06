@@ -13,8 +13,8 @@
             lname: "Last Name",
             email: "Email Address",
             phone: "Phone Number",
-            password: "Password",
-            confirmPassword: "Confirm Password",
+            onboarding: "Password Setup",
+            onboarding_note: "Password will be set securely through your invitation email after approval.",
             company: "Company Name",
             vat: "VAT Number / USt-IdNr.",
             eq: "Equipment & Capabilities",
@@ -29,7 +29,6 @@
             success:
                 "Application received! Our dispatch team will review your details.",
             err_file: "Please upload your Code 95 certificate.",
-            err_pwd: "Passwords do not match.",
             err_server:
                 "Server connection error. Please ensure the backend is running.",
             mockBtn: "🧪 Fill Mock Data",
@@ -43,8 +42,8 @@
             lname: "Nachname",
             email: "E-Mail Adresse",
             phone: "Telefonnummer",
-            password: "Passwort",
-            confirmPassword: "Passwort bestätigen",
+            onboarding: "Passwort Einrichtung",
+            onboarding_note: "Das Passwort wird nach Freigabe sicher per Einladungs-E-Mail gesetzt.",
             company: "Firmenname",
             vat: "USt-IdNr.",
             eq: "Ausrüstung & Fähigkeiten",
@@ -59,7 +58,6 @@
             success:
                 "Bewerbung erhalten! Unser Dispositionsteam wird Ihre Daten prüfen.",
             err_file: "Bitte laden Sie Ihr Code 95 Zertifikat hoch.",
-            err_pwd: "Passwörter stimmen nicht überein.",
             err_server:
                 "Serververbindungsfehler. Bitte prüfen Sie das Backend.",
             mockBtn: "🧪 Testdaten einfügen",
@@ -73,14 +71,8 @@
     let lastName = $state("");
     let email = $state("");
     let phone = $state("");
-    let password = $state("");
-    let confirmPassword = $state("");
     let companyName = $state("");
     let vatNumber = $state("");
-
-    // ── Password Visibility State ──
-    let showPassword = $state(false);
-    let showConfirmPassword = $state(false);
 
     let licenseClass = $state("CE");
     let trailerType = $state("Flatbed (1-2 cars)");
@@ -98,7 +90,6 @@
             lastName: "Weber",
             email: "driver1@gmail.com",
             phone: "+49 151 12345678",
-            password: "TestDriver123!",
             companyName: "Weber Transporte",
             vatNumber: "DE123456789",
             licenseClass: "CE",
@@ -110,7 +101,6 @@
             lastName: "Schmidt",
             email: "driver2@gmail.com",
             phone: "+49 172 98765432",
-            password: "TestDriver123!",
             companyName: "VIP Auto Kurier",
             vatNumber: "",
             licenseClass: "BE",
@@ -122,7 +112,6 @@
             lastName: "Meyer",
             email: "driver3@gmail.com",
             phone: "+49 160 55544433",
-            password: "TestDriver123!",
             companyName: "Meyer Multi-Haul GmbH",
             vatNumber: "DE987654321",
             licenseClass: "C1E",
@@ -138,8 +127,6 @@
         lastName = p.lastName;
         email = p.email;
         phone = p.phone;
-        password = p.password;
-        confirmPassword = p.password;
         companyName = p.companyName;
         vatNumber = p.vatNumber;
         licenseClass = p.licenseClass;
@@ -160,11 +147,6 @@
     async function submitApplication(e: Event) {
         e.preventDefault();
 
-        if (password !== confirmPassword) {
-            errorMessage = t.err_pwd;
-            return;
-        }
-
         if (!code95FileName) {
             errorMessage = t.err_file;
             return;
@@ -183,7 +165,6 @@
                     lastName,
                     email,
                     phone,
-                    password,
                     companyName,
                     vatNumber,
                     licenseClass,
@@ -199,8 +180,6 @@
                 lastName = "";
                 email = "";
                 phone = "";
-                password = "";
-                confirmPassword = "";
                 companyName = "";
                 vatNumber = "";
                 hasWinch = false;
@@ -222,7 +201,7 @@
     <title>Apply as Driver | ShutUP Forwarder</title>
 </svelte:head>
 
-<section class="min-h-screen bg-slate-100 py-10 px-6 font-sans">
+<main class="min-h-screen bg-slate-100 py-10 px-6 font-sans" aria-labelledby="driver-apply-title">
     <div class="max-w-3xl mx-auto">
         <div class="flex justify-between items-center mb-8">
             <a
@@ -265,7 +244,7 @@
         </div>
 
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h1 id="driver-apply-title" class="text-4xl font-extrabold text-slate-900 tracking-tight">
                 {t.title}
             </h1>
             <p class="text-slate-500 mt-3 text-lg">{t.sub}</p>
@@ -299,162 +278,73 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
                         <label
+                            for="firstName"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.fname}</label
                         >
                         <input
+                            id="firstName"
                             type="text"
                             bind:value={firstName}
+                            autocomplete="given-name"
                             required
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
                     <div>
                         <label
+                            for="lastName"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.lname}</label
                         >
                         <input
+                            id="lastName"
                             type="text"
                             bind:value={lastName}
+                            autocomplete="family-name"
                             required
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
                     <div>
                         <label
+                            for="email"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.email}</label
                         >
                         <input
+                            id="email"
                             type="email"
                             bind:value={email}
+                            autocomplete="email"
                             required
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
                     <div>
                         <label
+                            for="phone"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.phone}</label
                         >
                         <input
+                            id="phone"
                             type="tel"
                             bind:value={phone}
+                            autocomplete="tel"
                             required
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
 
-                    <div>
-                        <label
-                            class="block text-sm font-semibold text-slate-700 mb-2"
-                            >{t.password}</label
-                        >
-                        <div class="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                bind:value={password}
-                                required
-                                class="w-full p-3 pr-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                            />
-                            <button
-                                type="button"
-                                onclick={() => (showPassword = !showPassword)}
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
-                            >
-                                {#if showPassword}
-                                    <svg
-                                        class="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        ><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                                        /></svg
-                                    >
-                                {:else}
-                                    <svg
-                                        class="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        ><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        /><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                        /></svg
-                                    >
-                                {/if}
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label
-                            class="block text-sm font-semibold text-slate-700 mb-2"
-                            >{t.confirmPassword}</label
-                        >
-                        <div class="relative">
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                bind:value={confirmPassword}
-                                required
-                                class="w-full p-3 pr-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                            />
-                            <button
-                                type="button"
-                                onclick={() =>
-                                    (showConfirmPassword =
-                                        !showConfirmPassword)}
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
-                            >
-                                {#if showConfirmPassword}
-                                    <svg
-                                        class="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        ><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                                        /></svg
-                                    >
-                                {:else}
-                                    <svg
-                                        class="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        ><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        /><path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                        /></svg
-                                    >
-                                {/if}
-                            </button>
-                        </div>
+                    <div class="md:col-span-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4">
+                        <p class="m-0 font-semibold">{t.onboarding}</p>
+                        <p class="m-0 mt-1 text-sm">{t.onboarding_note}</p>
                     </div>
 
                     <div>
                         <label
+                            for="companyName"
                             class="block text-sm font-semibold text-slate-700 mb-2 mt-4"
                             >{t.company}
                             <span class="text-slate-400 font-normal"
@@ -462,13 +352,16 @@
                             ></label
                         >
                         <input
+                            id="companyName"
                             type="text"
                             bind:value={companyName}
+                            autocomplete="organization"
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
                     <div>
                         <label
+                            for="vatNumber"
                             class="block text-sm font-semibold text-slate-700 mb-2 mt-4"
                             >{t.vat}
                             <span class="text-slate-400 font-normal"
@@ -476,8 +369,10 @@
                             ></label
                         >
                         <input
+                            id="vatNumber"
                             type="text"
                             bind:value={vatNumber}
+                            autocomplete="off"
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         />
                     </div>
@@ -495,10 +390,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                     <div>
                         <label
+                            for="licenseClass"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.license}</label
                         >
                         <select
+                            id="licenseClass"
                             bind:value={licenseClass}
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         >
@@ -510,10 +407,12 @@
                     </div>
                     <div>
                         <label
+                            for="trailerType"
                             class="block text-sm font-semibold text-slate-700 mb-2"
                             >{t.trailer}</label
                         >
                         <select
+                            id="trailerType"
                             bind:value={trailerType}
                             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                         >
@@ -531,9 +430,11 @@
                 </div>
 
                 <label
+                    for="hasWinch"
                     class="flex items-center gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all"
                 >
                     <input
+                        id="hasWinch"
                         type="checkbox"
                         bind:checked={hasWinch}
                         class="w-6 h-6 text-blue-600 rounded bg-white border-slate-300 focus:ring-blue-500"
@@ -592,4 +493,4 @@
             </button>
         </form>
     </div>
-</section>
+</main>

@@ -330,7 +330,7 @@
                         </span>
 
                         <a
-                            href=""
+                            href="/submit/tracking?id={job.id}"
                             class="bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs py-2.5 px-4 rounded-lg border border-slate-200 shadow-sm transition-colors no-underline text-center"
                         >
                             Review Manifest

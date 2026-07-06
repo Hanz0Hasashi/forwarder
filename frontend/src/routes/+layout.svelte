@@ -3,6 +3,7 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
+    import { env } from "$env/dynamic/public";
     import { translations, type Lang } from "$lib/translations.js";
     import "../app.css";
 
@@ -12,6 +13,7 @@
     let currentRole = $state("");
     let mobileMenuOpen = $state(false);
     let lang = $state<Lang>("en");
+    const clerkPublishableKey = env.PUBLIC_CLERK_PUBLISHABLE_KEY;
     
     let t = $derived(translations[lang]);
 
@@ -56,7 +58,8 @@
                 const clerk = (window as any).Clerk;
                 if (clerk.loaded && !clerk.user && currentRole) {
                     currentRole = "";
-                    localStorage.clear();
+                    localStorage.removeItem("userRole");
+                    localStorage.removeItem("shutup-lang");
                     window.location.href = "/";
                 }
             }
@@ -104,7 +107,8 @@
     });
 </script>
 
-<ClerkProvider>
+{#if clerkPublishableKey}
+<ClerkProvider publishableKey={clerkPublishableKey}>
     {#if !isChecking}
         <div class="min-h-screen bg-slate-50 flex flex-col font-sans">
             {#if !$page.url.pathname.startsWith("/login") && !$page.url.pathname.startsWith("/signup") && !$page.url.pathname.startsWith("/driver-apply") && !$page.url.pathname.startsWith("/auth-sync")}
@@ -323,6 +327,23 @@
         <div class="h-screen bg-slate-50"></div>
     {/if}
 </ClerkProvider>
+{:else}
+    {#if !isChecking}
+        <div class="min-h-screen bg-slate-50 flex flex-col font-sans">
+            {#if $page.url.pathname === "/"}
+                {@render children()}
+            {:else}
+                <main
+                    class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+                >
+                    {@render children()}
+                </main>
+            {/if}
+        </div>
+    {:else}
+        <div class="h-screen bg-slate-50"></div>
+    {/if}
+{/if}
 
 <style>
     /* Premium dark Slate/Blue theme styles for our header */

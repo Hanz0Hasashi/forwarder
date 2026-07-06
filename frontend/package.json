@@ -8,6 +8,7 @@
 		"build": "npx prisma generate && npx prisma db push && npx prisma db seed && vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
+		"test": "vitest run",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
@@ -31,10 +32,12 @@
 		"@ai-sdk/groq": "^4.0.2",
 		"@ai-sdk/openai": "^3.0.67",
 		"@ai-sdk/svelte": "^5.0.9",
+		"@clerk/backend": "^3.10.0",
 		"@prisma/client": "^5.22.0",
 		"@upstash/vector": "^1.2.3",
 		"ai": "^7.0.9",
 		"svelte-clerk": "^1.1.9",
+		"vitest": "^4.1.10",
 		"zod": "^4.4.3"
 	},
 	"prisma": {

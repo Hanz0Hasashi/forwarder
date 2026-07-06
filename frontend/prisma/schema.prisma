@@ -107,7 +107,6 @@ model DriverRequest {
   lastName        String
   email           String   @unique
   phone           String
-  password        String   
   
   // Optional Business Details
   companyName     String?

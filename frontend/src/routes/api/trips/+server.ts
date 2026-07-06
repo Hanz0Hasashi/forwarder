@@ -1,21 +1,22 @@
 import { json } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 
-export async function GET({ url }) {
-  const role = url.searchParams.get("role");
-  const customerId = url.searchParams.get("customerId");
-  const forwarderId = url.searchParams.get("forwarderId");
-  
+export async function GET({ locals }) {
+  const { userId, role } = locals.auth;
+  if (!userId || !role) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const whereClause: any = {};
   
-  if (role === "admin") {
+  if (role === 'ADMIN') {
     // Admin sees all
-  } else if (customerId) {
-    whereClause.customerId = customerId;
-  } else if (forwarderId) {
+  } else if (role === 'CUSTOMER') {
+    whereClause.customerId = userId;
+  } else if (role === 'FORWARDER') {
     whereClause.OR = [
-      { forwarderId: forwarderId },
-      { bids: { some: { forwarderId: forwarderId } } }
+      { forwarderId: userId },
+      { bids: { some: { forwarderId: userId } } }
     ];
   }
       

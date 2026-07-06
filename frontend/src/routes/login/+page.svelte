@@ -1,5 +1,8 @@
 <script lang="ts">
     import { SignIn } from 'svelte-clerk';
+    import { env } from '$env/dynamic/public';
+
+    const clerkPublishableKey = env.PUBLIC_CLERK_PUBLISHABLE_KEY;
 </script>
 
 <div class="login-wrapper">
@@ -13,7 +16,13 @@
             <h1>ShutUP <strong>Forwarder</strong></h1>
         </div>
         
-        <SignIn forceRedirectUrl="/auth-sync" signUpUrl="/signup" />
+        {#if clerkPublishableKey}
+            <SignIn forceRedirectUrl="/auth-sync" signUpUrl="/signup" />
+        {:else}
+            <div class="setup-warning" role="alert">
+                Clerk is not configured. Set <strong>PUBLIC_CLERK_PUBLISHABLE_KEY</strong> in your frontend environment file and restart dev server.
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -66,6 +75,18 @@
         align-items: center;
         gap: 1.5rem;
         z-index: 10;
+    }
+
+    .setup-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #f59e0b;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 0.95rem;
+        max-width: 420px;
+        text-align: center;
+        line-height: 1.5;
     }
 
     .brand-header {
