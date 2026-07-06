@@ -1,6 +1,7 @@
 import { createClerkClient } from '@clerk/backend';
 import { json, type Handle } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
+import { CLERK_SECRET_KEY } from '$env/static/private';
+import { PUBLIC_CLERK_PUBLISHABLE_KEY } from '$env/static/public';
 import { prisma } from '$lib/server/prisma';
 import {
   hasRequiredRole,
@@ -27,13 +28,13 @@ export const handle: Handle = async ({ event, resolve }) => {
     return resolve(event);
   }
 
-  if (!env.CLERK_SECRET_KEY) {
+  if (!CLERK_SECRET_KEY) {
     return json({ error: 'Authentication is not configured on the server.' }, { status: 500 });
   }
 
   const clerk = createClerkClient({
-    secretKey: env.CLERK_SECRET_KEY,
-    publishableKey: env.PUBLIC_CLERK_PUBLISHABLE_KEY || env.CLERK_PUBLISHABLE_KEY
+    secretKey: CLERK_SECRET_KEY,
+    publishableKey: PUBLIC_CLERK_PUBLISHABLE_KEY
   });
 
   const requestState = await clerk.authenticateRequest(event.request, {
