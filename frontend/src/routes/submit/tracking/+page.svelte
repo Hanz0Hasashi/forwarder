@@ -161,14 +161,14 @@
 
                     <!-- Step 2: Intake AI Review -->
                     {#if job.status === 'Reviewing'}
-                        <div class="time-item current">
-                            <div class="time-dot pulse">🔍</div>
+                        <div class="time-item done">
+                            <div class="time-dot">✅</div>
                             <div class="time-content">
-                                <strong>System Reviewing</strong> — Scanning condition photos & calculating dispatcher pricing.
+                                <strong>System Review Complete</strong> — Condition photos scanned & pricing calculated.
                             </div>
                         </div>
-                        <div class="time-item future">
-                            <div class="time-dot">○</div>
+                        <div class="time-item current">
+                            <div class="time-dot pulse">⏳</div>
                             <div class="time-content">
                                 <strong>Awaiting Driver Match</strong> — System negotiating with local transporters.
                             </div>
