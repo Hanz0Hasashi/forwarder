@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
-    import { env } from "$env/dynamic/public";
+    import { PUBLIC_CLERK_PUBLISHABLE_KEY } from "$env/static/public";
     import { translations, type Lang } from "$lib/translations.js";
     import "../app.css";
 
@@ -13,7 +13,7 @@
     let currentRole = $state("");
     let mobileMenuOpen = $state(false);
     let lang = $state<Lang>("en");
-    const clerkPublishableKey = env.PUBLIC_CLERK_PUBLISHABLE_KEY;
+    const clerkPublishableKey = PUBLIC_CLERK_PUBLISHABLE_KEY;
     
     let t = $derived(translations[lang]);
 
