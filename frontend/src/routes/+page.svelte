@@ -1,139 +1,50 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { translations, type Lang } from '$lib/translations.js';
-    import { goto } from '$app/navigation';
-    
-    // ── Reactive state ───────────────────────────────────────────────
+
     let lang = $state<Lang>('en');
     let t = $derived(translations[lang]);
-
-    let menuOpen = $state(false);
-    let isLoggedIn = $state(false);
     let currentRole = $state('');
 
-    // ── Quote form ───────────────────────────────────────────────────
-    let pickupAddr = $state('');
-    let deliveryAddr = $state('');
-    let carModel = $state('');
-    let email = $state('');
-    let quoteSubmitted = $state(false);
-    let quoteFields = $state({ pickup: true, delivery: true, car: true, email: true });
+    const steps = $derived([
+        { num: '01', icon: '📋', title: t.step1_title, desc: t.step1_desc },
+        { num: '02', icon: '🤖', title: t.step2_title, desc: t.step2_desc },
+        { num: '03', icon: '✅', title: t.step3_title, desc: t.step3_desc }
+    ]);
+
+    const features = $derived([
+        { icon: '🤝', title: t.feat1_title, desc: t.feat1_desc },
+        { icon: '📸', title: t.feat2_title, desc: t.feat2_desc },
+        { icon: '📍', title: t.feat3_title, desc: t.feat3_desc },
+        { icon: '🔍', title: t.feat4_title, desc: t.feat4_desc },
+        { icon: '📄', title: t.feat5_title, desc: t.feat5_desc },
+        { icon: '📜', title: t.feat6_title, desc: t.feat6_desc }
+    ]);
+
+    const faqItems = $derived([
+        { q: t.faq_q1, a: t.faq_a1 },
+        { q: t.faq_q2, a: t.faq_a2 },
+        { q: t.faq_q3, a: t.faq_a3 },
+        { q: t.faq_q4, a: t.faq_a4 },
+        { q: t.faq_q5, a: t.faq_a5 },
+        { q: t.faq_q6, a: t.faq_a6 }
+    ]);
+
+    const testimonials = $derived([
+        { text: t.test1_text, author: t.test1_author },
+        { text: t.test2_text, author: t.test2_author },
+        { text: t.test3_text, author: t.test3_author }
+    ]);
 
     function setLang(l: Lang) {
         lang = l;
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('shutup-lang', l);
-        }
-    }
-
-    function handleQuoteSubmit() {
-        quoteFields = {
-            pickup: !!pickupAddr.trim(),
-            delivery: !!deliveryAddr.trim(),
-            car: !!carModel.trim(),
-            email: !!email.trim()
-        };
-
-        if (!Object.values(quoteFields).every(Boolean)) return;
-
-        quoteSubmitted = true;
-
-        setTimeout(() => {
-            goto('/submit');
-        }, 1000); 
-    }
-
-    function handleLogout(e: Event) {
-        e.preventDefault();
-        if (typeof window !== 'undefined' && window.Clerk) {
-            window.Clerk.signOut({ redirectUrl: '/' }).then(() => {
-                isLoggedIn = false; 
-                currentRole = '';
-                localStorage.removeItem('userRole');
-            });
-        }
+        localStorage.setItem('shutup-lang', l);
     }
 
     onMount(() => {
         const saved = localStorage.getItem('shutup-lang') as Lang | null;
         if (saved === 'en' || saved === 'de') lang = saved;
-
-        // 1. Grab the role from memory
         currentRole = localStorage.getItem('userRole') || '';
-
-        // 2. INSTANT UI FIX: If they have a role, they are logged in. Show the Logout button immediately.
-        if (currentRole) {
-            isLoggedIn = true;
-        }
-
-        // 3. Robust Clerk Polling: Don't stop checking until the user is actually loaded
-        let checkInterval = setInterval(() => {
-            if (typeof window !== 'undefined' && window.Clerk) {
-                if (window.Clerk.user) {
-                    isLoggedIn = true;
-                    clearInterval(checkInterval); // NOW we can safely stop checking
-                }
-            }
-        }, 100);
-
-        // Safety net: kill the interval after 3 seconds if they are genuinely logged out
-        setTimeout(() => {
-            clearInterval(checkInterval);
-        }, 3000);
-
-        const nav = document.getElementById('nav');
-        const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 10);
-        window.addEventListener('scroll', onScroll, { passive: true });
-
-        const revealObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        revealObserver.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-        );
-        const revealSelectors = [
-            '.step', '.feature-card', '.evidence-step', '.for-who-card',
-            '.testimonial', '.section-label', '.section-title', '.section-sub',
-            '.evidence-chain', '.driver-perks', '.protection-note'
-        ];
-        revealSelectors.forEach((sel) => {
-            document.querySelectorAll(sel).forEach((el, i) => {
-                el.classList.add('reveal');
-                (el as HTMLElement).style.transitionDelay = `${i * 80}ms`;
-                revealObserver.observe(el);
-            });
-        });
-
-        const sections = document.querySelectorAll<HTMLElement>('section[id]');
-        const navAnchors = document.querySelectorAll<HTMLAnchorElement>('.nav__links a[href^="#"]');
-        const sectionObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        navAnchors.forEach((a) => {
-                            a.style.color = '';
-                            if (a.getAttribute('href') === `#${entry.target.id}`) {
-                                a.style.color = 'var(--c-primary)';
-                            }
-                        });
-                    }
-                });
-            },
-            { threshold: 0.4 }
-        );
-        sections.forEach((s) => sectionObserver.observe(s));
-
-        return () => {
-            clearInterval(checkInterval); 
-            window.removeEventListener('scroll', onScroll);
-            revealObserver.disconnect();
-            sectionObserver.disconnect();
-        };
     });
 </script>
 
@@ -142,489 +53,389 @@
     <meta name="description" content={t.page_desc} />
 </svelte:head>
 
-<section class="hero">
-    <div class="hero__bg-grid"></div>
-    <div class="container hero-flex">
-        <div class="hero__inner">
-            <div class="badge">{t.hero_badge}</div>
-            <h1 class="hero__headline">
-                {t.hero_h1_1}<br />
-                <span class="gradient-text">{t.hero_h1_2}</span>
-            </h1>
-            <p class="hero__sub">{t.hero_sub}</p>
-            
+<div class="bg-slate-50 text-slate-900">
+    <section class="relative overflow-hidden border-b border-slate-200/70 bg-gradient-to-br from-white via-sky-50 to-orange-50">
+        <div class="absolute inset-0 opacity-50 [background-image:radial-gradient(#dbeafe_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
+            <div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+                    {t.hero_badge}
+                </div>
+                <h1 class="mt-5 text-4xl font-black leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+                    {t.hero_h1_1}
+                    <span class="block bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">{t.hero_h1_2}</span>
+                </h1>
+                <p class="mt-5 max-w-xl text-base text-slate-600 sm:text-lg">{t.hero_sub}</p>
 
-            <div class="hero__trust mt-10">
-                <div class="trust-item">
-                    <span class="trust-stars">★★★★★</span>
+                <div class="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm text-slate-600 shadow-sm backdrop-blur">
+                    <span class="font-semibold text-amber-500">★★★★★</span>
                     <span>{t.hero_trust_rating}</span>
+                    <span class="hidden h-4 w-px bg-slate-200 sm:inline-block"></span>
+                    <span>{t.hero_trust_photos}</span>
+                    <span class="hidden h-4 w-px bg-slate-200 sm:inline-block"></span>
+                    <span>{t.hero_trust_ai}</span>
+                    <span class="hidden h-4 w-px bg-slate-200 sm:inline-block"></span>
+                    <span>{t.hero_trust_europe}</span>
                 </div>
-                <div class="trust-divider"></div>
-                <div class="trust-item">{t.hero_trust_photos}</div>
-                <div class="trust-divider"></div>
-                <div class="trust-item">{t.hero_trust_ai}</div>
-                <div class="trust-divider"></div>
-                <div class="trust-item">{t.hero_trust_europe}</div>
-            </div>
-        </div>
 
-        <div class="hero__mockup-wrap">
-            <div class="phone-mockup">
-                <div class="phone-screen">
-                    <div class="phone-bar">
-                        <span class="phone-dot"></span>
-                        <span class="phone-title">{t.phone_job}</span>
-                        <span class="phone-dot"></span>
+                <div class="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-1 py-1">
+                    <button
+                        class="rounded-full px-3 py-1 text-xs font-bold transition"
+                        class:bg-slate-900={lang === 'en'}
+                        class:text-white={lang === 'en'}
+                        class:text-slate-600={lang !== 'en'}
+                        onclick={() => setLang('en')}
+                    >
+                        EN
+                    </button>
+                    <button
+                        class="rounded-full px-3 py-1 text-xs font-bold transition"
+                        class:bg-slate-900={lang === 'de'}
+                        class:text-white={lang === 'de'}
+                        class:text-slate-600={lang !== 'de'}
+                        onclick={() => setLang('de')}
+                    >
+                        DE
+                    </button>
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl">
+                <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                    <div class="mb-3 flex items-center justify-between border-b border-slate-200 pb-3 text-xs font-semibold text-slate-500">
+                        <span>•</span>
+                        <span>{t.phone_job}</span>
+                        <span>•</span>
                     </div>
-                    <div class="phone-row phone-route">{t.phone_route}</div>
-                    <div class="phone-row phone-car">{t.phone_car}</div>
-                    <div class="phone-timeline">
-                        <div class="tl-item tl-done">{t.phone_collected}</div>
-                        <div class="tl-item tl-done">{t.phone_departed}</div>
-                        <div class="tl-item tl-active">{t.phone_active}</div>
-                        <div class="tl-item tl-future">{t.phone_future}</div>
+                    <div class="text-sm font-bold text-slate-900">{t.phone_route}</div>
+                    <div class="mt-1 text-xs text-slate-500">{t.phone_car}</div>
+                    <div class="mt-4 space-y-2 text-xs">
+                        <div class="text-emerald-600">{t.phone_collected}</div>
+                        <div class="text-emerald-600">{t.phone_departed}</div>
+                        <div class="font-semibold text-blue-600">{t.phone_active}</div>
+                        <div class="text-slate-500">{t.phone_future}</div>
                     </div>
-                    <div class="phone-driver">
+                    <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-3 text-xs">
                         <span>{t.phone_driver}</span>
-                        <span class="driver-stars">★★★★☆ 4.7</span>
+                        <span class="font-semibold text-amber-500">★★★★☆ 4.7</span>
                     </div>
-                    <div class="phone-actions">
-                        <button class="phone-btn phone-btn--call">📞 Call</button>
-                        <button class="phone-btn phone-btn--msg">💬 Message</button>
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        <button class="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1.5 text-xs font-semibold text-blue-700">📞 Call</button>
+                        <button class="rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-xs font-semibold text-emerald-700">💬 Message</button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="section" id="how-it-works">
-    <div class="container">
-        <div class="section-label">{t.how_label}</div>
-        <h2 class="section-title">{t.how_title}</h2>
-        <p class="section-sub">{t.how_sub}</p>
+    <section class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8" id="how-it-works">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.how_label}</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.how_title}</h2>
+        <p class="mt-4 max-w-2xl text-slate-600">{t.how_sub}</p>
 
-        <div class="steps">
-            <div class="step">
-                <div class="step__num">01</div>
-                <div class="step__icon">📋</div>
-                <h3>{t.step1_title}</h3>
-                <p>{t.step1_desc}</p>
-            </div>
-            <div class="step__connector"></div>
-            <div class="step">
-                <div class="step__num">02</div>
-                <div class="step__icon">🤖</div>
-                <h3>{t.step2_title}</h3>
-                <p>{t.step2_desc}</p>
-            </div>
-            <div class="step__connector"></div>
-            <div class="step">
-                <div class="step__num">03</div>
-                <div class="step__icon">✅</div>
-                <h3>{t.step3_title}</h3>
-                <p>{t.step3_desc}</p>
+        <div class="mt-10 grid gap-4 md:grid-cols-3">
+            {#each steps as step}
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                    <p class="text-xs font-extrabold tracking-[0.18em] text-blue-600">{step.num}</p>
+                    <p class="mt-3 text-3xl">{step.icon}</p>
+                    <h3 class="mt-4 text-lg font-bold text-slate-900">{step.title}</h3>
+                    <p class="mt-2 text-sm text-slate-600">{step.desc}</p>
+                </article>
+            {/each}
+        </div>
+    </section>
+
+    <section class="border-y border-slate-200/70 bg-white" id="features">
+        <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.features_label}</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.features_title}</h2>
+            <p class="mt-4 max-w-2xl text-slate-600">{t.features_sub}</p>
+
+            <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {#each features as feature}
+                    <article class="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:shadow-md">
+                        <p class="text-2xl">{feature.icon}</p>
+                        <h3 class="mt-4 text-lg font-bold text-slate-900">{feature.title}</h3>
+                        <p class="mt-2 text-sm text-slate-600">{feature.desc}</p>
+                    </article>
+                {/each}
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="section section--alt" id="features">
-    <div class="container">
-        <div class="section-label">{t.features_label}</div>
-        <h2 class="section-title">{t.features_title}</h2>
-        <p class="section-sub">{t.features_sub}</p>
+    <section class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8" id="protection">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.prot_label}</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.prot_title}</h2>
+        <p class="mt-4 max-w-2xl text-slate-600">{t.prot_sub}</p>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🤝</div>
-                <h3>{t.feat1_title}</h3>
-                <p>{t.feat1_desc}</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📸</div>
-                <h3>{t.feat2_title}</h3>
-                <p>{t.feat2_desc}</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📍</div>
-                <h3>{t.feat3_title}</h3>
-                <p>{t.feat3_desc}</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>{t.feat4_title}</h3>
-                <p>{t.feat4_desc}</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📄</div>
-                <h3>{t.feat5_title}</h3>
-                <p>{t.feat5_desc}</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📜</div>
-                <h3>{t.feat6_title}</h3>
-                <p>{t.feat6_desc}</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="section" id="protection">
-    <div class="container">
-        <div class="section-label">{t.prot_label}</div>
-        <h2 class="section-title">{t.prot_title}</h2>
-        <p class="section-sub">{t.prot_sub}</p>
-
-        <div class="evidence-chain">
-            <div class="evidence-step">
-                <div class="evidence-icon">📱</div>
-                <h4>{t.ev1_title}</h4>
-                <p>{t.ev1_desc}</p>
-                <div class="evidence-badge">🔒 Locked</div>
-            </div>
-            <div class="evidence-arrow">→</div>
-            <div class="evidence-step">
-                <div class="evidence-icon">🚛</div>
-                <h4>{t.ev2_title}</h4>
-                <p>{t.ev2_desc}</p>
-                <div class="evidence-badge">🔒 Locked</div>
-            </div>
-            <div class="evidence-arrow">→</div>
-            <div class="evidence-step">
-                <div class="evidence-icon">🏠</div>
-                <h4>{t.ev3_title}</h4>
-                <p>{t.ev3_desc}</p>
-                <div class="evidence-badge">🔒 Locked</div>
-            </div>
-            <div class="evidence-arrow">→</div>
-            <div class="evidence-step evidence-step--result">
-                <div class="evidence-icon">🤖</div>
-                <h4>{t.ev4_title}</h4>
-                <p>{t.ev4_desc}</p>
-                <div class="evidence-badge evidence-badge--ai">✦ AI Report</div>
-            </div>
+        <div class="mt-10 grid gap-4 lg:grid-cols-4">
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 text-center">
+                <p class="text-2xl">📱</p>
+                <h4 class="mt-2 font-bold">{t.ev1_title}</h4>
+                <p class="mt-1 text-sm text-slate-600">{t.ev1_desc}</p>
+                <span class="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">🔒 Locked</span>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 text-center">
+                <p class="text-2xl">🚛</p>
+                <h4 class="mt-2 font-bold">{t.ev2_title}</h4>
+                <p class="mt-1 text-sm text-slate-600">{t.ev2_desc}</p>
+                <span class="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">🔒 Locked</span>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 text-center">
+                <p class="text-2xl">🏠</p>
+                <h4 class="mt-2 font-bold">{t.ev3_title}</h4>
+                <p class="mt-1 text-sm text-slate-600">{t.ev3_desc}</p>
+                <span class="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">🔒 Locked</span>
+            </article>
+            <article class="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-orange-50 p-5 text-center">
+                <p class="text-2xl">🤖</p>
+                <h4 class="mt-2 font-bold">{t.ev4_title}</h4>
+                <p class="mt-1 text-sm text-slate-600">{t.ev4_desc}</p>
+                <span class="mt-3 inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">✦ AI Report</span>
+            </article>
         </div>
 
-        <div class="protection-note">
+        <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <strong>{t.prot_note_strong}</strong> {t.prot_note}
-        </div>
-    </div>
-</section>
+        </p>
+    </section>
 
-<section class="section section--alt" id="for-who">
-    <div class="container">
-        <div class="section-label">{t.who_label}</div>
-        <h2 class="section-title">{t.who_title}</h2>
+    <section class="border-y border-slate-200/70 bg-white" id="for-who">
+        <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.who_label}</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.who_title}</h2>
 
-        <div class="for-who-grid">
-            <div class="for-who-card">
-                <div class="for-who-icon">🧑</div>
-                <h3>{t.ind_title}</h3>
-                <ul>
-                    <li>{t.ind_li1}</li>
-                    <li>{t.ind_li2}</li>
-                    <li>{t.ind_li3}</li>
-                    <li>{t.ind_li4}</li>
-                </ul>
-                <a href="#quote" class="btn btn--primary">{t.ind_cta}</a>
+            <div class="mt-10 grid gap-6 lg:grid-cols-2">
+                <article class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <p class="text-3xl">🧑</p>
+                    <h3 class="mt-4 text-2xl font-bold">{t.ind_title}</h3>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-600">
+                        <li>• {t.ind_li1}</li>
+                        <li>• {t.ind_li2}</li>
+                        <li>• {t.ind_li3}</li>
+                        <li>• {t.ind_li4}</li>
+                    </ul>
+                    <a href="/submit" class="mt-6 inline-flex rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-500">{t.ind_cta}</a>
+                </article>
+
+                <article class="relative rounded-2xl border border-blue-300 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
+                    <span class="absolute -top-3 left-6 rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">{t.biz_badge}</span>
+                    <p class="text-3xl">🏢</p>
+                    <h3 class="mt-4 text-2xl font-bold">{t.biz_title}</h3>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-600">
+                        <li>• {t.biz_li1}</li>
+                        <li>• {t.biz_li2}</li>
+                        <li>• {t.biz_li3}</li>
+                        <li>• {t.biz_li4}</li>
+                    </ul>
+                    <a href="/submit" class="mt-6 inline-flex rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">{t.biz_cta}</a>
+                </article>
             </div>
-            <div class="for-who-card for-who-card--business">
-                <div class="for-who-card__badge">{t.biz_badge}</div>
-                <div class="for-who-icon">🏢</div>
-                <h3>{t.biz_title}</h3>
-                <ul>
-                    <li>{t.biz_li1}</li>
-                    <li>{t.biz_li2}</li>
-                    <li>{t.biz_li3}</li>
-                    <li>{t.biz_li4}</li>
-                </ul>
-                <a href="#quote" class="btn btn--primary">{t.biz_cta}</a>
-            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-{#if !currentRole}
-<section class="section drivers-section" id="drivers">
-    <div class="container drivers-inner">
-        <div class="drivers-text">
-            <div class="section-label section-label--light">{t.drv_label}</div>
-            <h2 class="section-title section-title--light">{t.drv_title}</h2>
-            <p class="section-sub section-sub--light">{t.drv_sub}</p>
-            <ul class="driver-perks">
-                <li>{t.drv_li1}</li>
-                <li>{t.drv_li2}</li>
-                <li>{t.drv_li3}</li>
-                <li>{t.drv_li4}</li>
-                <li>{t.drv_li5}</li>
-            </ul>
-            <a href="/driver-apply" class="btn btn--white btn--lg">{t.drv_cta}</a>
-        </div>
-        <div class="drivers-mockup">
-            <div class="phone-mockup phone-mockup--dark">
-                <div class="phone-screen phone-screen--dark">
-                    <div class="phone-bar phone-bar--dark">
-                        <span class="phone-title">{t.drv_jobs}</span>
-                        <span class="phone-notif">🔔 2</span>
-                    </div>
-                    <div class="job-card">
-                        <div class="job-route">Amsterdam → Munich</div>
-                        <div class="job-car">BMW 3 Series · 2019</div>
-                        <div class="job-date">📅 Thu 22 Apr</div>
-                        <div class="job-price">💶 €320 – €380</div>
-                        <div class="job-btns">
-                            <button class="job-btn job-btn--bid">💬 Bid</button>
-                            <button class="job-btn job-btn--accept">✅ Accept</button>
-                        </div>
-                    </div>
-                    <div class="job-card job-card--dim">
-                        <div class="job-route">Rotterdam → Berlin</div>
-                        <div class="job-car">VW Golf · ⚠️ Non-running</div>
-                        <div class="job-date">📅 Fri 23 Apr</div>
-                        <div class="job-price">💶 €290 – €350</div>
-                        <div class="job-btns">
-                            <button class="job-btn job-btn--bid">💬 Bid</button>
-                            <button class="job-btn job-btn--accept">✅ Accept</button>
-                        </div>
+    {#if !currentRole}
+        <section class="bg-gradient-to-br from-slate-950 to-slate-900 text-white" id="drivers">
+            <div class="mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-sky-300">{t.drv_label}</p>
+                    <h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">{t.drv_title}</h2>
+                    <p class="mt-4 max-w-2xl text-slate-300">{t.drv_sub}</p>
+                    <ul class="mt-6 space-y-2 text-sm text-slate-200">
+                        <li>• {t.drv_li1}</li>
+                        <li>• {t.drv_li2}</li>
+                        <li>• {t.drv_li3}</li>
+                        <li>• {t.drv_li4}</li>
+                        <li>• {t.drv_li5}</li>
+                    </ul>
+                    <a href="/driver-apply" class="mt-7 inline-flex rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">{t.drv_cta}</a>
+                </div>
+
+                <div class="rounded-3xl border border-slate-700 bg-slate-800 p-5">
+                    <div class="text-sm font-semibold text-slate-200">{t.drv_jobs}</div>
+                    <div class="mt-4 space-y-3">
+                        <article class="rounded-xl border border-slate-700 bg-slate-900 p-3">
+                            <p class="font-semibold">Amsterdam → Munich</p>
+                            <p class="text-xs text-slate-400">BMW 3 Series · 2019</p>
+                            <p class="mt-1 text-xs text-slate-400">📅 Thu 22 Apr</p>
+                            <p class="mt-1 text-sm font-bold text-amber-400">💶 €320 – €380</p>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <button class="rounded-lg bg-blue-950 px-2 py-1 text-xs font-semibold text-sky-300">💬 Bid</button>
+                                <button class="rounded-lg bg-emerald-950 px-2 py-1 text-xs font-semibold text-emerald-300">✅ Accept</button>
+                            </div>
+                        </article>
+                        <article class="rounded-xl border border-slate-700 bg-slate-900/60 p-3 opacity-80">
+                            <p class="font-semibold">Rotterdam → Berlin</p>
+                            <p class="text-xs text-slate-400">VW Golf · ⚠️ Non-running</p>
+                            <p class="mt-1 text-xs text-slate-400">📅 Fri 23 Apr</p>
+                            <p class="mt-1 text-sm font-bold text-amber-400">💶 €290 – €350</p>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <button class="rounded-lg bg-blue-950 px-2 py-1 text-xs font-semibold text-sky-300">💬 Bid</button>
+                                <button class="rounded-lg bg-emerald-950 px-2 py-1 text-xs font-semibold text-emerald-300">✅ Accept</button>
+                            </div>
+                        </article>
                     </div>
                 </div>
             </div>
+        </section>
+    {/if}
+
+    <section class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8" id="step-by-step">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.sbs_label}</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.sbs_title}</h2>
+
+        <div class="mt-10 space-y-8">
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s1_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s1_title}</h3>
+                <p class="mt-2 text-slate-600">{@html t.s1_desc}</p>
+            </article>
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s2_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s2_title}</h3>
+                <p class="mt-2 text-slate-600">{t.s2_desc}</p>
+            </article>
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s3_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s3_title}</h3>
+                <p class="mt-2 text-slate-600">{@html t.s3_desc}</p>
+            </article>
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s4_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s4_title}</h3>
+                <p class="mt-2 text-slate-600">{t.s4_desc}</p>
+            </article>
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s5_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s5_title}</h3>
+                <p class="mt-2 text-slate-600">{t.s5_desc}</p>
+            </article>
+            <article class="border-l-4 border-blue-600 pl-5">
+                <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">{t.s6_num}</p>
+                <h3 class="mt-1 text-xl font-bold">{t.s6_title}</h3>
+                <p class="mt-2 text-slate-600">{@html t.s6_desc}</p>
+            </article>
         </div>
-    </div>
-</section>
-{/if}
+    </section>
 
-<section class="section" id="step-by-step">
-    <div class="container">
-        <div class="section-label">{t.sbs_label}</div>
-        <h2 class="section-title">{t.sbs_title}</h2>
+    <section class="border-y border-slate-200/70 bg-white" id="agents">
+        <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.agents_label}</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.agents_title}</h2>
+            <p class="mt-4 max-w-2xl text-slate-600">{t.agents_sub}</p>
 
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s1_num}</div>
-                <h3>{t.s1_title}</h3>
-            </div>
-            <p class="deep-step__desc">{@html t.s1_desc}</p>
-        </div>
-
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s2_num}</div>
-                <h3>{t.s2_title}</h3>
-            </div>
-            <p class="deep-step__desc">{t.s2_desc}</p>
-        </div>
-
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s3_num}</div>
-                <h3>{t.s3_title}</h3>
-            </div>
-            <p class="deep-step__desc">{@html t.s3_desc}</p>
-        </div>
-
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s4_num}</div>
-                <h3>{t.s4_title}</h3>
-            </div>
-            <p class="deep-step__desc">{t.s4_desc}</p>
-        </div>
-
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s5_num}</div>
-                <h3>{t.s5_title}</h3>
-            </div>
-            <p class="deep-step__desc">{t.s5_desc}</p>
-        </div>
-
-        <div class="deep-step">
-            <div class="deep-step__header">
-                <div class="deep-step__num">{t.s6_num}</div>
-                <h3>{t.s6_title}</h3>
-            </div>
-            <p class="deep-step__desc">{@html t.s6_desc}</p>
-        </div>
-    </div>
-</section>
-
-<section class="section section--alt" id="agents">
-    <div class="container">
-        <div class="section-label">{t.agents_label}</div>
-        <h2 class="section-title">{t.agents_title}</h2>
-        <p class="section-sub">{t.agents_sub}</p>
-
-        <div class="roles-table-wrap">
-            <table class="roles-table">
-                <thead>
-                    <tr><th>{t.roles_who}</th><th>{t.roles_what}</th></tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>🧑 <strong>{t.role_customer}</strong></td>
-                        <td>{t.role_customer_desc}</td>
-                    </tr>
-                    <tr>
-                        <td>🚛 <strong>{t.role_driver}</strong></td>
-                        <td>{t.role_driver_desc}</td>
-                    </tr>
-                    <tr>
-                        <td>👩‍💼 <strong>{t.role_ops}</strong></td>
-                        <td>{t.role_ops_desc}</td>
-                    </tr>
-                    <tr>
-                        <td>👨‍💼 <strong>{t.role_adjuster}</strong></td>
-                        <td>{t.role_adjuster_desc}</td>
-                    </tr>
-                    <tr>
-                        <td>🔧 <strong>{t.role_admin}</strong></td>
-                        <td>{t.role_admin_desc}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<section class="section section--alt" id="faq">
-    <div class="container faq-container">
-        <div class="section-label">{t.faq_label}</div>
-        <h2 class="section-title">{t.faq_title}</h2>
-        <div class="faq-list">
-            <details class="faq-item">
-                <summary>{t.faq_q1}</summary>
-                <p>{t.faq_a1}</p>
-            </details>
-            <details class="faq-item">
-                <summary>{t.faq_q2}</summary>
-                <p>{t.faq_a2}</p>
-            </details>
-            <details class="faq-item">
-                <summary>{t.faq_q3}</summary>
-                <p>{t.faq_a3}</p>
-            </details>
-            <details class="faq-item">
-                <summary>{t.faq_q4}</summary>
-                <p>{t.faq_a4}</p>
-            </details>
-            <details class="faq-item">
-                <summary>{t.faq_q5}</summary>
-                <p>{t.faq_a5}</p>
-            </details>
-            <details class="faq-item">
-                <summary>{t.faq_q6}</summary>
-                <p>{t.faq_a6}</p>
-            </details>
-        </div>
-    </div>
-</section>
-
-<section class="section" id="testimonials">
-    <div class="container">
-        <div class="section-label">{t.test_label}</div>
-        <h2 class="section-title">{t.test_title}</h2>
-        <div class="testimonials-grid">
-            <div class="testimonial">
-                <div class="testimonial-stars">★★★★★</div>
-                <p>{t.test1_text}</p>
-                <div class="testimonial-author">{t.test1_author}</div>
-            </div>
-            <div class="testimonial">
-                <div class="testimonial-stars">★★★★★</div>
-                <p>{t.test2_text}</p>
-                <div class="testimonial-author">{t.test2_author}</div>
-            </div>
-            <div class="testimonial">
-                <div class="testimonial-stars">★★★★★</div>
-                <p>{t.test3_text}</p>
-                <div class="testimonial-author">{t.test3_author}</div>
+            <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50">
+                <table class="min-w-full text-left text-sm">
+                    <thead class="bg-slate-100 text-xs font-bold uppercase tracking-wide text-slate-600">
+                        <tr>
+                            <th class="px-4 py-3">{t.roles_who}</th>
+                            <th class="px-4 py-3">{t.roles_what}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr><td class="px-4 py-3">🧑 <strong>{t.role_customer}</strong></td><td class="px-4 py-3">{t.role_customer_desc}</td></tr>
+                        <tr><td class="px-4 py-3">🚛 <strong>{t.role_driver}</strong></td><td class="px-4 py-3">{t.role_driver_desc}</td></tr>
+                        <tr><td class="px-4 py-3">👩‍💼 <strong>{t.role_ops}</strong></td><td class="px-4 py-3">{t.role_ops_desc}</td></tr>
+                        <tr><td class="px-4 py-3">👨‍💼 <strong>{t.role_adjuster}</strong></td><td class="px-4 py-3">{t.role_adjuster_desc}</td></tr>
+                        <tr><td class="px-4 py-3">🔧 <strong>{t.role_admin}</strong></td><td class="px-4 py-3">{t.role_admin_desc}</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <section class="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 lg:px-8" id="faq">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.faq_label}</p>
+        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.faq_title}</h2>
 
-<footer class="footer">
-    <div class="container footer-inner">
-        <div class="footer-brand">
-            <a href="/" class="nav__logo">
-                <span class="logo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+        <div class="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+            {#each faqItems as item}
+                <details class="group p-4">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-slate-900">
+                        {item.q}
+                        <span class="text-blue-600 transition group-open:rotate-45">+</span>
+                    </summary>
+                    <p class="pt-3 text-sm text-slate-600">{item.a}</p>
+                </details>
+            {/each}
+        </div>
+    </section>
+
+    <section class="border-y border-slate-200/70 bg-white" id="testimonials">
+        <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">{t.test_label}</p>
+            <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{t.test_title}</h2>
+            <div class="mt-10 grid gap-4 md:grid-cols-3">
+                {#each testimonials as item}
+                    <article class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                        <p class="text-amber-500">★★★★★</p>
+                        <p class="mt-3 text-sm italic text-slate-600">{item.text}</p>
+                        <p class="mt-4 text-sm font-semibold text-slate-900">{item.author}</p>
+                    </article>
+                {/each}
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 text-slate-300">
+        <div class="mx-auto grid w-full max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-5 lg:px-8">
+            <div class="lg:col-span-2">
+                <a href="/" class="inline-flex items-center gap-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 17h4V5H2v12h3"></path>
                         <path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5"></path>
                         <path d="M14 17h1"></path>
                         <circle cx="7.5" cy="17.5" r="2.5"></circle>
                         <circle cx="17.5" cy="17.5" r="2.5"></circle>
                     </svg>
-                </span>
-                <span>ShutUP <strong>Forwarder</strong></span>
-            </a>
-            <p>{t.footer_tagline}</p>
-            <div class="footer-social">
-                <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a>
-                <a href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">ig</a>
-                <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">fb</a>
+                    <span class="font-bold">ShutUP Forwarder</span>
+                </a>
+                <p class="mt-4 max-w-md text-sm text-slate-400">{t.footer_tagline}</p>
+                <div class="mt-4 flex gap-3">
+                    <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="rounded-lg bg-slate-800 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-700">in</a>
+                    <a href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" class="rounded-lg bg-slate-800 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-700">ig</a>
+                    <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" class="rounded-lg bg-slate-800 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-700">fb</a>
+                </div>
             </div>
-        </div>
-        <div class="footer-links">
-            <div class="footer-col">
-                <h5>{t.footer_platform}</h5>
-                <a href="#how-it-works">{t.footer_how}</a>
-                <a href="#features">{t.footer_features}</a>
-                <a href="#protection">{t.footer_protection}</a>
-                <a href="#for-who">{t.footer_business}</a>
-                <a href="#drivers">{t.footer_drivers}</a>
-            </div>
-            <div class="footer-col">
-                <h5>{t.footer_routes}</h5>
-                <a href="/submit?region=nl">{t.footer_nl}</a>
-                <a href="/submit?region=de">{t.footer_de}</a>
-                <a href="/submit?region=be">{t.footer_be}</a>
-                <a href="/submit?region=fr">{t.footer_fr}</a>
-                <a href="/submit?region=eu">{t.footer_eu}</a>
-            </div>
-            <div class="footer-col">
-                <h5>{t.footer_company}</h5>
-                <a href="/#how-it-works">{t.footer_about}</a>
-                <a href="/#testimonials">{t.footer_blog}</a>
-                <a href="/driver-apply">{t.footer_careers}</a>
-                <a href="/#faq">{t.footer_contact}</a>
-            </div>
-            <div class="footer-col">
-                <h5>{t.footer_legal}</h5>
-                <a href="/#faq">{t.footer_tos}</a>
-                <a href="/#faq">{t.footer_privacy}</a>
-                <a href="/#faq">{t.footer_cookies}</a>
-                <a href="/#protection">{t.footer_cmr}</a>
-            </div>
-        </div>
-    </div>
-    <div class="container footer-bottom">
-        <span>{t.footer_copyright}</span>
-        <span>{t.footer_built}</span>
-    </div>
-</footer>
 
-<style>
-    /* Desktop layout for Hero */
-    @media (min-width: 1024px) {
-        .hero-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 2rem;
-            position: relative;
-            z-index: 10;
-        }
-        .hero__inner, .hero__mockup-wrap {
-            flex: 1;
-            margin: 0 !important;
-        }
-        .hero__mockup-wrap {
-            display: flex;
-            justify-content: flex-end;
-        }
-    }
-</style>
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-200">{t.footer_platform}</h5>
+                <div class="mt-3 space-y-2 text-sm text-slate-400">
+                    <a class="block hover:text-white" href="#how-it-works">{t.footer_how}</a>
+                    <a class="block hover:text-white" href="#features">{t.footer_features}</a>
+                    <a class="block hover:text-white" href="#protection">{t.footer_protection}</a>
+                    <a class="block hover:text-white" href="#for-who">{t.footer_business}</a>
+                    <a class="block hover:text-white" href="#drivers">{t.footer_drivers}</a>
+                </div>
+            </div>
+
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-200">{t.footer_routes}</h5>
+                <div class="mt-3 space-y-2 text-sm text-slate-400">
+                    <a class="block hover:text-white" href="/submit?region=nl">{t.footer_nl}</a>
+                    <a class="block hover:text-white" href="/submit?region=de">{t.footer_de}</a>
+                    <a class="block hover:text-white" href="/submit?region=be">{t.footer_be}</a>
+                    <a class="block hover:text-white" href="/submit?region=fr">{t.footer_fr}</a>
+                    <a class="block hover:text-white" href="/submit?region=eu">{t.footer_eu}</a>
+                </div>
+            </div>
+
+            <div>
+                <h5 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-200">{t.footer_legal}</h5>
+                <div class="mt-3 space-y-2 text-sm text-slate-400">
+                    <a class="block hover:text-white" href="/#faq">{t.footer_tos}</a>
+                    <a class="block hover:text-white" href="/#faq">{t.footer_privacy}</a>
+                    <a class="block hover:text-white" href="/#faq">{t.footer_cookies}</a>
+                    <a class="block hover:text-white" href="/#protection">{t.footer_cmr}</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-800">
+            <div class="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                <span>{t.footer_copyright}</span>
+                <span>{t.footer_built}</span>
+            </div>
+        </div>
+    </footer>
+</div>

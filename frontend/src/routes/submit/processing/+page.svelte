@@ -70,7 +70,7 @@
 </svelte:head>
 
 <section class="wizard-section">
-    <div class="container wizard-container">
+    <div class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 wizard-container">
         <div class="summary-card">
             <div class="job-id">
                 Job #SF-4821 <span class="badge-success">Submitted ✅</span>

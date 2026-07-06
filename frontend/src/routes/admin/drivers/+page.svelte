@@ -1,5 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import Button from "$lib/components/ui/Button.svelte";
+    import StatusBadge from "$lib/components/ui/StatusBadge.svelte";
     
 
     type DriverRequest = {
@@ -133,7 +135,7 @@
     }
 </script>
 
-<div class="p-8 max-w-[1400px] mx-auto">
+<div class="surface-canvas p-8 max-w-[1400px] mx-auto">
     <!-- Header Area -->
     <div class="flex justify-between items-start mb-8">
         <div>
@@ -145,11 +147,12 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
-            <button
+            <Button
                 type="button"
                 onclick={fetchRequests}
                 disabled={isLoading}
-                class="flex items-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm px-4 py-2.5 rounded-lg font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                variant="outline"
+                extraClass="gap-2"
             >
                 <svg
                     class={isLoading ? "animate-spin" : ""}
@@ -167,7 +170,7 @@
                     />
                 </svg>
                 Sync Requests
-            </button>
+            </Button>
 
         </div>
     </div>
@@ -187,9 +190,7 @@
     {/if}
 
     <!-- Table Container -->
-    <div
-        class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
-    >
+    <div class="surface-card rounded-xl overflow-hidden">
         <table class="w-full text-left border-collapse">
             <!-- This is the visible header row you wanted -->
             <thead class="bg-slate-50 border-b border-slate-200">
@@ -231,33 +232,33 @@
                         <td class="p-4 text-sm">{req.trailerType}</td>
                         <td class="p-4">
                             {#if req.hasCode95}
-                                <span
-                                    class="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded border border-green-200"
-                                >
+                                <StatusBadge tone="success" extraClass="gap-1 rounded px-2 py-1 normal-case tracking-normal">
                                     ✅ Code 95
-                                </span>
+                                </StatusBadge>
                             {/if}
                         </td>
                         <td class="p-4 text-right">
                             <div
                                 class="inline-flex items-center justify-end gap-2"
                             >
-                                <button
+                                <Button
                                     type="button"
                                     onclick={() => approveDriver(req.id)}
-                                    class="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-150 ease-in-out hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+                                    variant="secondary"
+                                    extraClass="rounded-full"
                                     disabled={processingIds.includes(req.id)}
                                 >
                                     Approve
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="button"
                                     onclick={() => rejectDriver(req.id)}
-                                    class="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition duration-150 ease-in-out hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-red-100 disabled:text-red-200"
+                                    variant="outline"
+                                    extraClass="rounded-full border-red-200 text-red-600 hover:bg-red-50"
                                     disabled={processingIds.includes(req.id)}
                                 >
                                     Reject
-                                </button>
+                                </Button>
                             </div>
                         </td>
                     </tr>

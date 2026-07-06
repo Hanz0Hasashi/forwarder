@@ -1,5 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import Button from '$lib/components/ui/Button.svelte';
+    import StatusBadge from '$lib/components/ui/StatusBadge.svelte';
 
     interface User {
         id: string;
@@ -74,7 +76,7 @@
     }
 </script>
 
-<div class="space-y-8 animate-fade-in p-6 bg-slate-50 min-h-[85vh] font-sans">
+<div class="space-y-8 surface-canvas surface-page font-sans">
     
     <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-5 gap-4">
         <div>
@@ -85,7 +87,7 @@
         </div>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="surface-card rounded-2xl overflow-hidden">
         {#if isLoading}
             <div class="py-20 text-center space-y-4">
                 <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
@@ -113,12 +115,16 @@
                                 </td>
                                 
                                 <td class="p-4 px-6 align-middle">
-                                    <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border inline-block
-                                               {user.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' : ''}
-                                               {user.role === 'employee' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
-                                               {user.role === 'client' ? 'bg-slate-100 text-slate-600 border-slate-200' : ''}">
+                                    <StatusBadge
+                                        tone={user.role === 'admin' ? 'info' : user.role === 'employee' ? 'info' : 'neutral'}
+                                        extraClass={user.role === 'admin'
+                                            ? 'bg-purple-50 text-purple-700 border-purple-200 text-[10px] tracking-widest'
+                                            : user.role === 'employee'
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200 text-[10px] tracking-widest'
+                                            : 'text-[10px] tracking-widest'}
+                                    >
                                         {user.role}
-                                    </span>
+                                    </StatusBadge>
                                 </td>
 
                                 <td class="p-4 px-6 align-middle">
@@ -135,8 +141,10 @@
                                 </td>
 
                                 <td class="p-4 px-6 align-middle text-right">
-                                    <button 
-                                        class="inline-flex items-center gap-1.5 bg-transparent border border-rose-200 hover:border-rose-400 text-rose-500 hover:bg-rose-50/50 font-bold text-xs py-2 px-3.5 rounded-lg transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        extraClass="gap-1.5 border-rose-200 text-rose-500 hover:border-rose-400 hover:bg-rose-50/50 disabled:opacity-30"
                                         onclick={() => deleteUser(user.id, user.name)}
                                         disabled={isUpdating || user.role === 'admin'} 
                                         title={user.role === 'admin' ? "System admin permissions cannot be soft-purged" : "Wipe profile node access"}
@@ -145,7 +153,7 @@
                                             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/>
                                         </svg>
                                         Remove 
-                                    </button>
+                                    </Button>
                                 </td>
                             </tr>
                         {/each}

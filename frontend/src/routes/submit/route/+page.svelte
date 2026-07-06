@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import Button from "$lib/components/ui/Button.svelte";
     
 
     let routeData = $state({
@@ -171,19 +172,21 @@
 </svelte:head>
 
 <section class="wizard-section">
-    <div class="container wizard-container">
+    <div class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 wizard-container">
         <div class="wizard-header">
             <a href="/submit/photos" class="back-link">← Back to Photos</a>
 
             <div class="header-right">
-                <button
+                <Button
                     type="button"
-                    class="mock-btn"
+                    variant="outline"
+                    size="sm"
+                    extraClass="border-dashed px-3 py-1.5 text-[11px]"
                     onclick={fillMockData}
                     title="Fill test route data"
                 >
                     🧪 Mock Data
-                </button>
+                </Button>
                 <div class="step-indicator">Step 3 of 5</div>
             </div>
         </div>
@@ -299,9 +302,11 @@
                     </div>
                 </fieldset>
 
-                <button
+                <Button
                     type="submit"
-                    class="submit-btn"
+                    variant="primary"
+                    size="lg"
+                    extraClass="w-full"
                     disabled={isSubmitting}
                 >
                     {#if isSubmitting}
@@ -309,7 +314,7 @@
                     {:else}
                         Submit Job →
                     {/if}
-                </button>
+                </Button>
             </form>
         </div>
     </div>
@@ -319,14 +324,14 @@
     /* Premium Light Theme Styles */
     .wizard-section {
         min-height: 100vh;
-        background: #f8fafc; /* slate-50 */
-        color: #0f172a; /* slate-900 */
-        padding: 60px 20px;
+        background: var(--app-bg);
+        color: var(--text-strong);
+        padding: var(--wizard-pad-y) var(--wizard-pad-x);
         font-family: "Inter", system-ui, sans-serif;
     }
 
     .wizard-container {
-        max-width: 600px;
+        max-width: var(--wizard-max-width);
         margin: 0 auto;
     }
 
@@ -344,67 +349,47 @@
         gap: 12px;
     }
 
-    .mock-btn {
-        background: #f1f5f9;
-        border: 1px dashed #cbd5e1;
-        color: #64748b;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .mock-btn:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-        border-color: #94a3b8;
-    }
-
     .back-link {
-        color: #64748b;
+        color: var(--text-muted);
         text-decoration: none;
         font-weight: 600;
         font-size: 0.95rem;
         transition: color 0.2s ease;
     }
     .back-link:hover {
-        color: #2563eb;
+        color: var(--accent-primary-strong);
     }
 
     .step-indicator {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
+        background: var(--surface);
+        border: 1px solid var(--border-subtle);
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 700;
         letter-spacing: 0.5px;
-        color: #475569;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        color: var(--text-label);
+        box-shadow: var(--shadow-chip);
     }
 
     .wizard-card {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 24px;
-        padding: 48px;
-        box-shadow:
-            0 20px 25px -5px rgba(0, 0, 0, 0.05),
-            0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        background: var(--surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
+        padding: var(--wizard-card-pad);
+        box-shadow: var(--shadow-card);
     }
 
     .wizard-title {
         font-size: 2.2rem;
         font-weight: 800;
         margin: 0 0 12px 0;
-        color: #0f172a;
+        color: var(--text-strong);
         letter-spacing: -0.025em;
     }
 
     .wizard-sub {
-        color: #64748b;
+        color: var(--text-muted);
         margin: 0 0 40px 0;
         font-size: 1.05rem;
         line-height: 1.5;
@@ -415,6 +400,7 @@
         flex-direction: column;
         gap: 24px;
     }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -430,7 +416,7 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #475569;
+        color: var(--text-label);
         padding: 0;
     }
 
@@ -439,35 +425,35 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #475569;
+        color: var(--text-label);
     }
 
     input[type="text"],
     input[type="date"] {
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
+        background: var(--surface-soft);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-input);
         padding: 16px;
-        color: #0f172a;
+        color: var(--text-strong);
         font-size: 1rem;
         transition: all 0.2s ease;
     }
     input[type="text"]::placeholder {
-        color: #94a3b8;
+        color: var(--border-subtle);
     }
     input[type="text"]:focus,
     input[type="date"]:focus {
         outline: none;
-        border-color: #3b82f6;
+        border-color: var(--accent-primary);
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-        background: #ffffff;
+        background: var(--surface);
     }
 
     /* Custom Radio & Checkbox Styling - Light Theme */
     .divider {
         border: 0;
         height: 1px;
-        background: #e2e8f0;
+        background: var(--border-soft);
         margin: 8px 0;
     }
 
@@ -548,45 +534,12 @@
         font-weight: bold;
     }
 
-    .submit-btn {
-        margin-top: 10px;
-        width: 100%;
-        padding: 18px;
-        font-size: 1.1rem;
-        border-radius: 12px;
-        background: #10b981;
-        color: white;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        transition:
-            transform 0.1s ease,
-            box-shadow 0.2s ease;
-        box-shadow:
-            0 4px 6px -1px rgba(16, 185, 129, 0.2),
-            0 2px 4px -1px rgba(16, 185, 129, 0.1);
-    }
-    .submit-btn:hover:not(:disabled) {
-        background: #059669;
-        transform: translateY(-2px);
-        box-shadow:
-            0 10px 15px -3px rgba(16, 185, 129, 0.3),
-            0 4px 6px -2px rgba(16, 185, 129, 0.15);
-    }
-    .submit-btn:disabled {
-        background: #f1f5f9;
-        color: #94a3b8;
-        border: 1px solid #cbd5e1;
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-
     @media (max-width: 600px) {
         .wizard-card {
-            padding: 30px 20px;
+            padding: var(--wizard-card-pad-mobile-y) var(--wizard-card-pad-mobile-x);
         }
         .wizard-section {
-            padding: 30px 15px;
+            padding: var(--wizard-pad-y-mobile) var(--wizard-pad-x-mobile);
         }
     }
 

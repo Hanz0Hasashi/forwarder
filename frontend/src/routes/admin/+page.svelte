@@ -1,5 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import Button from "$lib/components/ui/Button.svelte";
+    import StatusBadge from "$lib/components/ui/StatusBadge.svelte";
     
 
     interface Job {
@@ -135,7 +137,7 @@
     }
 </script>
 
-<div class="space-y-8 animate-fade-in p-6 bg-slate-50 min-h-[85vh]">
+<div class="space-y-8 surface-canvas surface-page">
     <div
         class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-5 gap-4"
     >
@@ -157,23 +159,29 @@
                 + {dbJobs.length} Live)
             </span>
 
-            <a
+            <Button
                 href="/admin/users"
-                class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-sm transition-all text-xs no-underline"
+                variant="secondary"
+                size="sm"
+                extraClass="rounded-full gap-2"
             >
                 👥 Manage Team
-            </a>
+            </Button>
 
-            <a
+            <Button
                 href="/admin/drivers"
-                class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-sm transition-all text-xs no-underline"
+                variant="secondary"
+                size="sm"
+                extraClass="rounded-full gap-2"
             >
                 🚛 Drivers requests
-            </a>
+            </Button>
 
-            <button
+            <Button
                 onclick={fetchJobs}
-                class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-sm transition-colors text-xs border-0 cursor-pointer"
+                variant="primary"
+                size="sm"
+                extraClass="rounded-full gap-2"
             >
                 <svg
                     width="14"
@@ -190,7 +198,7 @@
                     />
                 </svg>
                 Sync Engine
-            </button>
+            </Button>
         </div>
     </div>
 
@@ -227,9 +235,7 @@
     </div>
 
     {#if isLoading}
-        <div
-            class="py-20 text-center space-y-4 bg-white border border-slate-200 rounded-2xl shadow-sm"
-        >
+        <div class="py-20 text-center space-y-4 surface-card rounded-2xl">
             <div
                 class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"
             ></div>
@@ -238,15 +244,11 @@
             </p>
         </div>
     {:else if filteredJobs().length === 0}
-        <div
-            class="p-16 text-center text-sm text-slate-400 font-medium bg-white border border-slate-200 rounded-2xl shadow-sm"
-        >
+        <div class="p-16 text-center text-sm text-slate-400 font-medium surface-card rounded-2xl">
             No active shipping records found matching this filtering context.
         </div>
     {:else}
-        <div
-            class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100"
-        >
+        <div class="surface-card rounded-2xl overflow-hidden divide-y divide-slate-100">
             {#each filteredJobs() as job (job.id)}
                 <div
                     class="p-6 hover:bg-slate-50/50 transition-colors flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative"
@@ -261,16 +263,11 @@
                                 SF-{job.jobNumber || "ERR"}
                             </span>
 
-                            <span
-                                class="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border
-                                       {job.aiIsValid
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                    : 'bg-rose-50 text-rose-700 border-rose-200'}"
-                            >
+                            <StatusBadge tone={job.aiIsValid ? "success" : "danger"}>
                                 {job.aiIsValid
                                     ? "Cleared"
                                     : "Flagged Exception"}
-                            </span>
+                            </StatusBadge>
                             {#if job.id.startsWith("SF-")}
                                 <span
                                     class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider"
@@ -329,16 +326,19 @@
                             {job.status || "Received"}
                         </span>
 
-                        <a
-                            href="/submit/tracking?id={job.id}"
-                            class="bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs py-2.5 px-4 rounded-lg border border-slate-200 shadow-sm transition-colors no-underline text-center"
+                        <Button
+                            href={`/submit/tracking?id=${job.id}`}
+                            variant="outline"
+                            size="sm"
                         >
                             Review Manifest
-                        </a>
+                        </Button>
 
-                        <button
+                        <Button
                             onclick={() => deleteJob(job.id, job.jobNumber)}
-                            class="bg-transparent border border-rose-200/60 hover:border-rose-400 text-rose-500 hover:bg-rose-50/50 p-2.5 rounded-lg transition-all cursor-pointer"
+                            variant="outline"
+                            size="sm"
+                            extraClass="border-rose-200/60 text-rose-500 hover:border-rose-400 hover:bg-rose-50/50 px-2.5 py-2.5"
                             title="Purge shipping sequence reference"
                         >
                             <svg
@@ -355,7 +355,7 @@
                                     d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"
                                 />
                             </svg>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             {/each}

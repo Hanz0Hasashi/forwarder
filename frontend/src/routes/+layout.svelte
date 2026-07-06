@@ -112,7 +112,7 @@
     {#if !isChecking}
         <div class="min-h-screen bg-slate-50 flex flex-col font-sans">
             {#if !$page.url.pathname.startsWith("/login") && !$page.url.pathname.startsWith("/signup") && !$page.url.pathname.startsWith("/driver-apply") && !$page.url.pathname.startsWith("/auth-sync")}
-                <header class="layout-navbar sticky top-0 z-50">
+                <header class="sticky top-0 z-50 border-b border-white/15 bg-gradient-to-r from-slate-950/90 to-slate-900/90 backdrop-blur-xl shadow-[0_12px_32px_rgba(7,19,38,0.28)]">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div class="flex items-center justify-between h-16">
                             <!-- Logo Brand -->
@@ -173,16 +173,14 @@
                             <!-- Actions, Language Toggle & User Button -->
                             <div class="hidden md:flex items-center space-x-4">
                                 {#if $page.url.pathname === "/"}
-                                    <div class="lang-switcher">
+                                    <div class="inline-flex items-center gap-px rounded-full border border-white/20 bg-white/10 p-1">
                                         <button
-                                            class="lang-btn"
-                                            class:active={lang === "en"}
+                                            class={`rounded-full px-3 py-1 text-[11px] font-extrabold tracking-wide transition-all duration-200 cursor-pointer border-0 ${lang === "en" ? "bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-[0_8px_16px_rgba(0,118,228,0.35)]" : "text-white/70 hover:text-white hover:bg-white/10"}`}
                                             onclick={() => setLang("en")}
                                             >EN</button
                                         >
                                         <button
-                                            class="lang-btn"
-                                            class:active={lang === "de"}
+                                            class={`rounded-full px-3 py-1 text-[11px] font-extrabold tracking-wide transition-all duration-200 cursor-pointer border-0 ${lang === "de" ? "bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-[0_8px_16px_rgba(0,118,228,0.35)]" : "text-white/70 hover:text-white hover:bg-white/10"}`}
                                             onclick={() => setLang("de")}
                                             >DE</button
                                         >
@@ -268,16 +266,14 @@
                                         class="text-xs text-slate-400 font-bold uppercase tracking-wider"
                                         >Language</span
                                     >
-                                    <div class="lang-switcher">
+                                    <div class="inline-flex items-center gap-px rounded-full border border-white/20 bg-white/10 p-1">
                                         <button
-                                            class="lang-btn"
-                                            class:active={lang === "en"}
+                                            class={`rounded-full px-3 py-1 text-[11px] font-extrabold tracking-wide transition-all duration-200 cursor-pointer border-0 ${lang === "en" ? "bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-[0_8px_16px_rgba(0,118,228,0.35)]" : "text-white/70 hover:text-white hover:bg-white/10"}`}
                                             onclick={() => setLang("en")}
                                             >EN</button
                                         >
                                         <button
-                                            class="lang-btn"
-                                            class:active={lang === "de"}
+                                            class={`rounded-full px-3 py-1 text-[11px] font-extrabold tracking-wide transition-all duration-200 cursor-pointer border-0 ${lang === "de" ? "bg-gradient-to-r from-blue-600 to-sky-400 text-white shadow-[0_8px_16px_rgba(0,118,228,0.35)]" : "text-white/70 hover:text-white hover:bg-white/10"}`}
                                             onclick={() => setLang("de")}
                                             >DE</button
                                         >
@@ -345,46 +341,3 @@
     {/if}
 {/if}
 
-<style>
-    /* Premium dark Slate/Blue theme styles for our header */
-    .layout-navbar {
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .lang-switcher {
-        display: flex;
-        gap: 1px;
-        align-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 8px;
-        overflow: hidden;
-        background: rgba(15, 23, 42, 0.6);
-        padding: 2px;
-    }
-
-    .lang-btn {
-        background: none;
-        border: none;
-        padding: 4px 10px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.65);
-        transition: all 0.2s ease;
-        border-radius: 5px;
-    }
-
-    .lang-btn.active {
-        background: #2563eb;
-        color: #ffffff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    .lang-btn:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-    }
-</style>

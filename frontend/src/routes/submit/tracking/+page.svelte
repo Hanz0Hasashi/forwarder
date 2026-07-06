@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import Button from "$lib/components/ui/Button.svelte";
     
 
     let job = $state<any>(null);
@@ -83,7 +84,7 @@
 </svelte:head>
 
 <section class="wizard-section">
-    <div class="container wizard-container">
+    <div class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 wizard-container">
         {#if isLoading}
             <div class="wizard-card text-center py-20 space-y-4">
                 <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
@@ -94,11 +95,11 @@
                 <span class="text-4xl">⚠️</span>
                 <h2 class="text-xl font-bold text-slate-800 mt-4">{errorMessage || "Job not found"}</h2>
                 <p class="text-slate-500 mt-2">Could not retrieve tracking details for this load.</p>
-                <a href="/" class="btn btn--primary mt-6">Return to Dashboard</a>
+                <Button href="/" variant="primary" extraClass="mt-6 rounded-full">Return to Dashboard</Button>
             </div>
         {:else}
             <div class="wizard-header">
-                <a href="/trips" class="back-link">← Back to Trips</a>
+                <Button href="/trips" variant="outline" size="sm" extraClass="rounded-full">← Back to Trips</Button>
                 <div class="step-indicator" 
                      class:success-indicator={job.status === 'Completed' || job.status === 'Pending Pickup'} 
                      class:danger-indicator={job.status === 'Canceled'}>
@@ -307,9 +308,9 @@
                         </div>
                         {#if job.status === 'Reviewing' || job.status === 'Pending Pickup'}
                             <div class="mt-4">
-                                <button onclick={cancelBooking} class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-3 px-4 rounded-xl border border-red-200 transition-colors cursor-pointer text-sm">
+                                <Button onclick={cancelBooking} variant="outline" size="lg" extraClass="w-full rounded-xl border-red-200 bg-red-50 text-red-600 hover:bg-red-100">
                                     ❌ Cancel Transport Booking
-                                </button>
+                                </Button>
                             </div>
                         {/if}
                     {/if}
@@ -323,14 +324,14 @@
     /* Premium Light Theme Styles */
     .wizard-section {
         min-height: 100vh;
-        background: #f8fafc; /* slate-50 */
-        color: #0f172a;
-        padding: 60px 20px;
+        background: var(--app-bg);
+        color: var(--text-strong);
+        padding: var(--wizard-pad-y) var(--wizard-pad-x);
         font-family: "Inter", system-ui, sans-serif;
     }
 
     .wizard-container {
-        max-width: 600px;
+        max-width: var(--wizard-max-width);
         margin: 0 auto;
     }
 
@@ -340,46 +341,33 @@
         align-items: center;
         margin-bottom: 30px;
     }
-    .back-link {
-        color: #64748b;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: color 0.2s;
-    }
-    .back-link:hover {
-        color: #2563eb;
-    }
-
     .step-indicator {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
+        background: var(--surface);
+        border: 1px solid var(--border-subtle);
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 700;
-        color: #475569;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        color: var(--text-label);
+        box-shadow: var(--shadow-chip);
     }
     .success-indicator {
-        background: #dcfce7;
-        border-color: #86efac;
-        color: #16a34a;
+        background: var(--success-soft);
+        border-color: var(--success-border);
+        color: var(--success-text);
     }
     .danger-indicator {
-        background: #fef2f2;
-        border-color: #fca5a5;
-        color: #ef4444;
+        background: var(--danger-soft);
+        border-color: var(--danger-border);
+        color: var(--danger-text);
     }
 
     .wizard-card {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
         padding: 40px;
-        box-shadow:
-            0 20px 25px -5px rgba(0, 0, 0, 0.05),
-            0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        box-shadow: var(--shadow-card);
     }
 
     .job-header {
@@ -387,7 +375,7 @@
         margin-bottom: 32px;
     }
     .job-id {
-        color: #64748b;
+        color: var(--text-muted);
         font-size: 0.95rem;
         font-weight: 700;
         margin-bottom: 8px;
@@ -398,13 +386,13 @@
         font-size: 1.6rem;
         font-weight: 800;
         margin: 0;
-        color: #0f172a;
+        color: var(--text-strong);
     }
 
     .divider {
         border: 0;
         height: 1px;
-        background: #e2e8f0;
+        background: var(--border-soft);
         margin: 28px 0;
     }
 
