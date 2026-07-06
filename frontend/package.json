@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "npx prisma generate && npx prisma db push && npx prisma db seed && vite build",
+		"build": "npx prisma generate && npx prisma db push --accept-data-loss && npx prisma db seed && vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"test": "vitest run",
