@@ -128,7 +128,7 @@
 
             <div class="ai-box" class:visible={isScanning || aiNote}>
                 {#if isScanning}
-                    <div class="scanning-text">🤖 Bypassing AI vision processing...</div>
+                    <div class="scanning-text">🔍 Bypassing automatic image verification...</div>
                 {:else if aiNote}
                     <div class="ai-alert">{aiNote}</div>
                 {/if}

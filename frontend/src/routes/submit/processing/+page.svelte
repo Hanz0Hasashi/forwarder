@@ -66,7 +66,7 @@
 </script>
 
 <svelte:head>
-    <title>AI Processing | ShutUP Forwarder</title>
+    <title>Processing | ShutUP Forwarder</title>
 </svelte:head>
 
 <section class="wizard-section">
@@ -85,8 +85,8 @@
 
         <div class="wizard-card processing-card">
             <div class="ai-header">
-                <span class="pulse-robot">🤖</span>
-                <h1 class="wizard-title">AI is working on your job...</h1>
+                <span class="pulse-robot">⚙️</span>
+                <h1 class="wizard-title">System is processing your job...</h1>
             </div>
 
             <div class="checklist">

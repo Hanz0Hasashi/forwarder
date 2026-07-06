@@ -37,6 +37,14 @@ Instead of relying on human brokers, the platform uses AI agents to automate dis
 ![Admin-Pages Placeholder](./screenshots/admin-page-2.png)
 
 
+## Test Credentials
+
+If you are testing the application, you can use the following default credentials to experience the different roles:
+
+- **Admin Account**: `admin@gmail.com`
+- **Client Account**: `client@gmail.com`
+- **Driver Account**: `driver@gmail.com`
+- **PASSWORD for all** : `12345678`
 
 ## Tech Stack
 

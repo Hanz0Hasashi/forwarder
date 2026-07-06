@@ -271,24 +271,24 @@
                         </div>
                         <div class="cell-actions text-right">
                             <div class="flex-actions justify-end">
+                                {#if (currentRole === 'FORWARDER' || currentRole === 'employee') && ['Pending Pickup', 'In Transit', 'Delivery Protocol'].includes(trip.status)}
+                                    <button onclick={() => openDriverTracker(trip)} class="btn-action btn-primary btn-sm">
+                                        Pickup
+                                    </button>
+                                {/if}
                                 {#if trip.status !== 'Completed' && trip.status !== 'Canceled'}
                                     <a href="/submit/tracking?id={trip.id}" class="btn-action btn-outline btn-sm">
                                         Track
                                     </a>
                                 {/if}
-                                {#if currentRole !== 'admin' && ['Reviewing', 'Pending Client Approval', 'Pending Pickup'].includes(trip.status)}
-                                    <button onclick={() => cancelTrip(trip.id)} class="btn-action btn-danger btn-sm">
-                                        Cancel
-                                    </button>
-                                {/if}
-                                {#if (currentRole === 'FORWARDER' || currentRole === 'employee') && ['Pending Pickup', 'In Transit', 'Delivery Protocol'].includes(trip.status)}
-                                    <button onclick={() => openDriverTracker(trip)} class="btn-action btn-primary btn-sm">
-                                        Tracker
-                                    </button>
-                                {/if}
                                 {#if currentRole === 'admin' && ['Completed', 'Canceled'].includes(trip.status)}
                                     <button onclick={() => deleteTrip(trip.id)} class="btn-action btn-danger btn-sm">
                                         Delete
+                                    </button>
+                                {/if}
+                                {#if ['Reviewing', 'Pending Client Approval', 'Pending Pickup'].includes(trip.status)}
+                                    <button onclick={() => cancelTrip(trip.id)} class="btn-action btn-danger btn-sm">
+                                        Cancel
                                     </button>
                                 {/if}
                             </div>
@@ -318,7 +318,7 @@
                                  {trip.aiReasoning && trip.aiReasoning.includes('Flagged') 
                                      ? 'bg-red-50 border-red-200 text-red-700' 
                                      : 'bg-emerald-50 border-emerald-200 text-emerald-700'}">
-                                {trip.aiReasoning || "✅ AI Cleared: No Damage Detected Vehicle matches original condition. Job complete."}
+                                {trip.aiReasoning || "✅ System Cleared: No Damage Detected Vehicle matches original condition. Job complete."}
                             </div>
                         {/if}
                     </div>

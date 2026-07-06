@@ -160,9 +160,6 @@
                 Select a job to view details and negotiate your rate.
             </p>
         </div>
-        <div class="header-actions">
-            <a href="/" class="btn-outline">Exit Marketplace</a>
-        </div>
     </header>
 
     <div class="main-content-split">
@@ -172,6 +169,9 @@
                     class="job-list-row"
                     class:active-row={selectedJob?.id === job.id}
                     onclick={() => openBiddingStation(job.id)}
+                    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openBiddingStation(job.id) }}
+                    role="button"
+                    tabindex="0"
                 >
                     <div class="cell-vehicle">
                         <span class="job-id-tag w-fit">SF-{job.jobNumber}</span>
@@ -413,22 +413,6 @@
         font-weight: 500;
     }
 
-    .btn-outline {
-        background: #ffffff;
-        color: #475569;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 600;
-        border: 1px solid #cbd5e1;
-        transition: all 0.2s;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-    .btn-outline:hover {
-        background: #f1f5f9;
-        color: #0f172a;
-        border-color: #94a3b8;
-    }
 
     /* SPLIT VIEW LAYOUT */
     .main-content-split {
@@ -555,112 +539,6 @@
         color: #ffffff;
     }
 
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    .payout {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #10b981;
-    }
-    .distance {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #475569;
-        background: #f1f5f9;
-        padding: 4px 10px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .route-info {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        margin-bottom: 24px;
-        position: relative;
-    }
-    .location {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        z-index: 2;
-    }
-    .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-top: 4px;
-        border: 2px solid #ffffff;
-        box-shadow: 0 0 0 2px currentColor;
-    }
-    .pickup-dot {
-        color: #0ea5e9;
-        background: #0ea5e9;
-    }
-    .delivery-dot {
-        color: #8b5cf6;
-        background: #8b5cf6;
-    }
-
-    .text-group {
-        display: flex;
-        flex-direction: column;
-    }
-    .label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: #64748b;
-        letter-spacing: 0.5px;
-    }
-    .city {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
-
-    .route-line {
-        position: absolute;
-        left: 5px;
-        top: 20px;
-        bottom: 20px;
-        width: 2px;
-        background: dashed 2px #cbd5e1;
-        z-index: 1;
-    }
-
-    .vehicle-info {
-        font-size: 0.95rem;
-        color: #475569;
-        margin-bottom: 16px;
-        font-weight: 500;
-    }
-
-    .ai-insight {
-        background: #f0f9ff;
-        border: 1px solid #bae6fd;
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        margin-bottom: 24px;
-        margin-top: auto;
-    }
-    .ai-icon {
-        font-size: 1.2rem;
-    }
-    .ai-text {
-        font-size: 0.85rem;
-        color: #0369a1;
-        line-height: 1.4;
-        font-weight: 500;
-    }
 
     .btn-accept {
         width: 100%;
@@ -685,9 +563,7 @@
         cursor: not-allowed;
         box-shadow: none;
     }
-    .btn-accept.loading {
-        animation: pulse 1.5s infinite;
-    }
+
     .sidebar-btn {
         width: auto;
         padding: 10px 20px;

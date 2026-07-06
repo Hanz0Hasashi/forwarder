@@ -230,8 +230,8 @@
                 {#if estimatedCost()}
                     <div class="estimate-card animate-fade-in">
                         <div class="estimate-header">
-                            <span class="estimate-icon">🤖</span>
-                            <h3>Intake AI Cost Estimate</h3>
+                            <span class="estimate-icon">📊</span>
+                            <h3>System Cost Estimate</h3>
                         </div>
                         <div class="estimate-price">€{estimatedCost()}</div>
                         <div class="estimate-subtext">Estimated Distance: {estimatedDistance()}</div>
@@ -305,9 +305,9 @@
                     disabled={isSubmitting}
                 >
                     {#if isSubmitting}
-                        Dispatching to AI Agent...
+                        Processing request...
                     {:else}
-                        Submit Job to AI Dispatch →
+                        Submit Job →
                     {/if}
                 </button>
             </form>

@@ -162,15 +162,15 @@
                     <!-- Step 2: Intake AI Review -->
                     {#if job.status === 'Reviewing'}
                         <div class="time-item current">
-                            <div class="time-dot pulse">🤖</div>
+                            <div class="time-dot pulse">🔍</div>
                             <div class="time-content">
-                                <strong>Intake AI Reviewing</strong> — Scanning condition photos & calculating dispatcher pricing.
+                                <strong>System Reviewing</strong> — Scanning condition photos & calculating dispatcher pricing.
                             </div>
                         </div>
                         <div class="time-item future">
                             <div class="time-dot">○</div>
                             <div class="time-content">
-                                <strong>Awaiting Driver Match</strong> — AI negotiating with local transporters.
+                                <strong>Awaiting Driver Match</strong> — System negotiating with local transporters.
                             </div>
                         </div>
                         <div class="time-item future">
@@ -184,7 +184,7 @@
                         <div class="time-item done">
                             <div class="time-dot">✅</div>
                             <div class="time-content">
-                                <strong>AI Check Passed</strong> — Baseline condition profile locked.
+                                <strong>Verification Passed</strong> — Baseline condition profile locked.
                             </div>
                         </div>
                         <div class="time-item current">
@@ -230,7 +230,7 @@
                         <div class="time-item current">
                             <div class="time-dot pulse">📸</div>
                             <div class="time-content">
-                                <strong>AI Inspection Active</strong> — Comparing pickup & delivery condition states.
+                                <strong>System Inspection Active</strong> — Comparing pickup & delivery condition states.
                             </div>
                         </div>
                         <div class="time-item future">
@@ -244,7 +244,7 @@
                         <div class="time-item done">
                             <div class="time-dot">✅</div>
                             <div class="time-content">
-                                <strong>Arrived & Inspected</strong> — Condition checked by Intake AI.
+                                <strong>Arrived & Inspected</strong> — Condition checked by System.
                             </div>
                         </div>
                         <div class="time-item done">
@@ -293,16 +293,16 @@
                         </div>
                     {:else}
                         <div class="driver-info">
-                            <div class="driver-avatar">🤖</div>
+                            <div class="driver-avatar">⚙️</div>
                             <div class="driver-details">
-                                <h3>AI Dispatch Broker</h3>
+                                <h3>Automated Dispatch</h3>
                                 <div class="driver-stats">
                                     Awaiting driver bids (Target Price: €{job.targetPrice})
                                 </div>
                             </div>
                         </div>
                         <div class="driver-update">
-                            <span class="update-time">Intake AI Status</span>
+                            <span class="update-time">System Status</span>
                             <p>"Broadcasting shipment data to regional carriers. Bidding negotiations active."</p>
                         </div>
                         {#if job.status === 'Reviewing' || job.status === 'Pending Pickup'}

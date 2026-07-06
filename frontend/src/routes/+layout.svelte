@@ -192,15 +192,6 @@
                                         {displayRole()}
                                     </span>
 
-                                    {#if currentRole !== 'admin' && currentRole !== 'ADMIN'}
-                                        <a
-                                            href="/"
-                                            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold py-2 px-4 rounded-lg border border-slate-700 transition-colors no-underline"
-                                        >
-                                            Dashboard
-                                        </a>
-                                    {/if}
-
                                     <div
                                         class="bg-white rounded-full flex items-center justify-center p-0.5 ml-2"
                                     >
